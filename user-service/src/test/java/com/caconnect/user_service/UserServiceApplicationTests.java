@@ -1,4 +1,4 @@
-package com.nearca.user_service;
+package com.caconnect.user_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

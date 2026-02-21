@@ -1,4 +1,4 @@
-package com.nearca.user_service.model;
+package com.caconnect.user_service.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,8 +40,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
-    private String keyCloakId;
+    /*
+        use when keycloak is config
+    * */
+    /* private String keyCloakId; */
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -52,7 +54,7 @@ public class User {
     private String lastName;
 
     @Enumerated(EnumType.STRING)
-    private static final UserRole role = UserRole.USER;
+    private  UserRole role ;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

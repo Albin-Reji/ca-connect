@@ -1,4 +1,4 @@
-package com.nearca.user_service;
+package com.caconnect.user_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

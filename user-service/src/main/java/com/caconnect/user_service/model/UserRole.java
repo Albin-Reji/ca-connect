@@ -1,4 +1,4 @@
-package com.nearca.user_service.model;
+package com.caconnect.user_service.model;
 
 /**
 *{@link UserRole}
