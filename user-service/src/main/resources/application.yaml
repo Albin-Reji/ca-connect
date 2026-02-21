@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: user-service
+#  database connection
+  datasource:
+    username: postgres
+    password: albin
+    url: jdbc:postgresql://localhost:5432/ca_connect_db
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+#  eureka client config
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+#user service port
+server:
+  port: 8081
