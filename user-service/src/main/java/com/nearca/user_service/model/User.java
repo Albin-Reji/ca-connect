@@ -1,7 +1,10 @@
-package com.nearca.user_service.controller.model;
+package com.nearca.user_service.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
@@ -26,20 +29,21 @@ import java.time.LocalDateTime;
  *
  * @author Albin
  */
+
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(unique = true)
-    private String userId;
+    private String keyCloakId;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -48,7 +52,7 @@ public class User {
     private String lastName;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role=UserRole.USER;
+    private static final UserRole role = UserRole.USER;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
