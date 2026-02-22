@@ -7,29 +7,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
 /**
- * Represents a user in the system.
- * <p>
- * This entity stores the essential details of a user including their unique identifier,
- * login credentials, personal information, and role within the application.
- * The entity automatically tracks creation and update timestamps.
- * </p>
+ * Entity representing an application user.
  *
- * <p>Annotations used:</p>
+ * <p>This class maps to the {@code users} table in the database and stores
+ * authentication details, personal information, role, and audit timestamps.</p>
+ *
+ * <p>Each user is uniquely identified by:
  * <ul>
- *     <li>{@link jakarta.persistence.Entity}</li>
- *     <li>{@link jakarta.persistence.Table}</li>
- *     <li>{@link lombok.Data}</li>
- *     <li>{@link lombok.Builder}</li>
- *     <li>{@link lombok.AllArgsConstructor}</li>
- *     <li>{@link lombok.NoArgsConstructor}</li>
+ *     <li>Database UUID ({@code id})</li>
+ *     <li>Keycloak ID ({@code keyCloakId})</li>
+ *     <li>Email address ({@code email})</li>
  * </ul>
+ *
+ * <p>Timestamps are automatically handled by Hibernate.</p>
  *
  * @author Albin
  */
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -37,29 +34,64 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 public class User {
+
+    /**
+     * Primary unique identifier for the user.
+     * Generated automatically as UUID.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    /*
-        use when keycloak is config
-    * */
-    /* private String keyCloakId; */
 
+    /**
+     * Unique identifier of the user in Keycloak authentication server.
+     * Used to map application users with external identity provider.
+     */
+    @Column(unique = true, nullable = false)
+    private String keyCloakId;
+
+    /**
+     * User email address.
+     * Must be unique and not null.
+     */
     @Column(unique = true, nullable = false)
     private String email;
 
+    /**
+     * Encrypted user password stored in database.
+     * Required for authentication fallback or local login.
+     */
     @Column(nullable = false)
     private String password;
+
+    /**
+     * User's first name.
+     */
     private String firstName;
+
+    /**
+     * User's last name.
+     */
     private String lastName;
 
+    /**
+     * Role assigned to the user (e.g., USER, ADMIN).
+     * Stored as string in database.
+     */
     @Enumerated(EnumType.STRING)
-    private  UserRole role ;
+    private UserRole role;
 
+    /**
+     * Timestamp indicating when the user record was created.
+     * Automatically populated on insert.
+     */
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    /**
+     * Timestamp indicating when the user record was last updated.
+     * Automatically updated on modification.
+     */
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
 }

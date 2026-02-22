@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UserResponse {
     private String id;
-    /*private String keyCloakId;*/
+    private String keyCloakId;
     private String email;
     private String firstName;
     private String lastName;

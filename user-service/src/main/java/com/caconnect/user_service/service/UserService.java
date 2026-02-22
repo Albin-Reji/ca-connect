@@ -16,6 +16,7 @@ public class UserService {
 
     public UserResponse register(RegisterRequest request) {
         User user= User.builder()
+                .keyCloakId(request.getKeyCloakId())
                 .email(request.getEmail())
                 .password(request.getPassword())
                 .firstName(request.getFirstName())
@@ -25,17 +26,27 @@ public class UserService {
 
         User savedUser=userRepository.save(user);
 
-        return UserResponse.builder()
-                .id(savedUser.getId())
-                .email(savedUser.getEmail())
-                .firstName(savedUser.getFirstName())
-                .lastName(savedUser.getLastName())
-                .role(savedUser.getRole())
-                .createdAt(savedUser.getCreatedAt())
-                .updatedAt(savedUser.getUpdatedAt())
-                .build();
+        return mapToUserResponse(savedUser);
 
     }
 
 
+    public UserResponse getUserById(String userId) {
+        User user=userRepository.getReferenceById(userId);
+        return mapToUserResponse(user);
+
+    }
+    public UserResponse mapToUserResponse(User user){
+        return UserResponse.builder()
+                .id(user.getId())
+                .keyCloakId(user.getKeyCloakId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+
+    }
 }
