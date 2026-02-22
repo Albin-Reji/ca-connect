@@ -8,6 +8,9 @@ import com.caconnect.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ *
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -36,6 +39,11 @@ public class UserService {
         return mapToUserResponse(user);
 
     }
+
+    public Boolean validateUserByKeyCloakId(String keyCloakId) {
+        return userRepository.existsByKeyCloakId(keyCloakId);
+    }
+
     public UserResponse mapToUserResponse(User user){
         return UserResponse.builder()
                 .id(user.getId())
@@ -49,4 +57,6 @@ public class UserService {
                 .build();
 
     }
+
+
 }
