@@ -31,6 +31,11 @@ public class LocationController {
         );
     }
 
+    @GetMapping("/{locationId}")
+    public ResponseEntity<Location> getLocationByLocationId(@PathVariable("locationId") String locationId){
+        return ResponseEntity.ok(locationService.getLocationByLocationId(locationId));
+    }
+
     @GetMapping("/nearest")
     public ResponseEntity<List<Location>> getNearestLocation(@ModelAttribute LatLonLimitRequest request){
         return ResponseEntity.ok(locationService.getNearestLocation(request));
