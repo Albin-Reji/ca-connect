@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: profile-service
+
+# db connection
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ca_connect_db
+    username: postgres
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+# eureka client configuration
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+# geo cage api key config
+geoCage:
+  api:
+    key: ${GEO_CAGE_API_KEY}
+# server port
+server:
+  port: 8083
