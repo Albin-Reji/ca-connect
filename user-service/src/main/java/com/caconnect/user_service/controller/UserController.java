@@ -91,4 +91,8 @@ public class UserController {
                 userService.validateUserByKeyCloakId(keyCloakId)
         );
     }
+    @GetMapping("/userId/{userId}")
+    public ResponseEntity<Boolean> isUserExistByUserId(@PathVariable("userId") String userId){
+        return ResponseEntity.ok(userService.isUserExistByUserId(userId));
+    }
 }
