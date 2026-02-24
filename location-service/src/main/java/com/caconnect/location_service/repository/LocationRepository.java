@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LocationRepository extends JpaRepository<Location, String> {
@@ -25,5 +26,5 @@ public interface LocationRepository extends JpaRepository<Location, String> {
             @Param("lat") Double lat,@Param("lon") Double lon, @Param("limit") Integer limit
     );
 
-    Location findByLocationId(String locationId);
+    Optional<Location> findByLocationId(String locationId);
 }
