@@ -2,6 +2,7 @@ package com.caconnect.location_service.service;
 
 import com.caconnect.location_service.dto.LatLonLimitRequest;
 import com.caconnect.location_service.dto.LocationRequest;
+import com.caconnect.location_service.exception.InvalidLocationIdException;
 import com.caconnect.location_service.model.Location;
 import com.caconnect.location_service.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,8 @@ public class LocationService {
     }
 
     public Location getLocationByLocationId(String locationId) {
-        return locationRepository.findByLocationId(locationId);
+        return locationRepository.findByLocationId(locationId)
+                .orElseThrow(()->
+                        new InvalidLocationIdException("Location Id Not Found....."));
     }
 }
