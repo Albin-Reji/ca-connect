@@ -35,4 +35,8 @@ public class LocationService {
                 latLonLimitRequest.getLongitude(),
                 latLonLimitRequest.getLimit());
     }
+
+    public Location getLocationByLocationId(String locationId) {
+        return locationRepository.findByLocationId(locationId);
+    }
 }

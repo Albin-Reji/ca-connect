@@ -13,19 +13,21 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processorPath>
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
+        <module name="location-service" />
         <module name="user-service" />
       </profile>
-      <profile name="Annotation profile for location-service" enabled="true">
+      <profile name="Annotation profile for profile-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath>
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
-        <module name="location-service" />
+        <module name="profile-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -37,6 +39,7 @@
       <module name="eureka" options="-parameters" />
       <module name="eureka (1) (com.server)" options="-parameters" />
       <module name="location-service" options="-parameters" />
+      <module name="profile-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>
