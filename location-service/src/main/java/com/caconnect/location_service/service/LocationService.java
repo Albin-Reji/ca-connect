@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-<<<<<<< HEAD
-=======
 import reactor.core.scheduler.Schedulers;
->>>>>>> main
 
 import java.util.List;
 
@@ -28,26 +25,6 @@ public class LocationService {
         this.locationRepository = locationRepository;
         this.userServiceWebClient = userServiceWebClient;
     }
-<<<<<<< HEAD
-
-    public Location getLocationByUserId(String userId) {
-        return locationRepository.getByUserId(userId);
-    }
-
-    public Location saveLocationToDB(LocationRequest locationRequest) {
-        /* check the user exist in user DB*/
-        Boolean isUserExistByUserId=isUserExist(locationRequest.getUserId()).block();
-
-        if(Boolean.FALSE.equals(isUserExistByUserId)){
-            throw new UserNotFoundException("UserId is Invalid :: InvalidLocationIdException");
-        }
-        Location location=Location.builder()
-                .userId(locationRequest.getUserId())
-                .latitude(locationRequest.getLatitude())
-                .longitude(locationRequest.getLongitude())
-                .build();
-        return locationRepository.save(location);
-=======
     public Mono<Location> saveLocationToDB(LocationRequest locationRequest) {
         return isUserExist(locationRequest.getUserId())
                 .defaultIfEmpty(false)
@@ -70,7 +47,6 @@ public class LocationService {
     public Mono<Location> getLocationByUserId(String userId) {
         return Mono.fromCallable(() -> locationRepository.getByUserId(userId))
                 .subscribeOn(Schedulers.boundedElastic());
->>>>>>> main
     }
 
     public Mono<Location> getLocationByLocationId(String locationId) {
@@ -84,15 +60,6 @@ public class LocationService {
         return Mono.fromCallable(() ->
                 locationRepository.getNearestLocation(req.getLatitude(), req.getLongitude(), req.getLimit())
         ).subscribeOn(Schedulers.boundedElastic());
-    }
-    /* checking whether user exist for this fucntion()
-        saveLocationToDB(LocationRequest locationRequest)
-    * */
-    public Mono<Boolean> isUserExist(String userId){
-        return userServiceWebClient.get()
-                .uri("/api/users/userId/{userId}", userId)
-                .retrieve()
-                .bodyToMono(Boolean.class);
     }
     /* checking whether user exist for this fucntion()
         saveLocationToDB(LocationRequest locationRequest)
