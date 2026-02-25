@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/profiles")
 @RequiredArgsConstructor
@@ -16,13 +18,13 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     @PostMapping("/")
-    public Mono<ResponseEntity<UserProfile>> saveUserProfile(@RequestBody UserProfileRequest request){
-        return userProfileService.saveUserProfile(request)
-                .map(ResponseEntity::ok);
+    public Mono<UserProfile> saveUserProfile(@RequestBody UserProfileRequest request){
+        return userProfileService.saveUserProfile(request);
     }
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserProfile> getUserProfile(@PathVariable("userId") String userId){
         return ResponseEntity.ok(userProfileService.getUserProfile(userId));
     }
+
 }

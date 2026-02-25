@@ -7,6 +7,7 @@ import com.caconnect.location_service.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -18,26 +19,26 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping("/")
-    public ResponseEntity<Location> saveLocationToDB(@RequestBody LocationRequest locationRequest){
-        return ResponseEntity.ok(
-                locationService.saveLocationToDB(locationRequest)
-        );
+    public Mono<ResponseEntity<Location>> saveLocationToDB(@RequestBody LocationRequest locationRequest) {
+        return locationService.saveLocationToDB(locationRequest)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/users/{userId}/location")
-    public ResponseEntity<Location> getLocationByUserId(@PathVariable("userId") String userId){
-        return ResponseEntity.ok(
-            locationService.getLocationByUserId(userId)
-        );
+    public Mono<ResponseEntity<Location>> getLocationByUserId(@PathVariable String userId) {
+        return locationService.getLocationByUserId(userId)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{locationId}")
-    public ResponseEntity<Location> getLocationByLocationId(@PathVariable("locationId") String locationId){
-        return ResponseEntity.ok(locationService.getLocationByLocationId(locationId));
+    public Mono<ResponseEntity<Location>> getLocationByLocationId(@PathVariable String locationId) {
+        return locationService.getLocationByLocationId(locationId)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/nearest")
-    public ResponseEntity<List<Location>> getNearestLocation(@ModelAttribute LatLonLimitRequest request){
-        return ResponseEntity.ok(locationService.getNearestLocation(request));
+    public Mono<ResponseEntity<List<Location>>> getNearestLocation(@ModelAttribute LatLonLimitRequest request) {
+        return locationService.getNearestLocation(request)
+                .map(ResponseEntity::ok);
     }
 }
