@@ -15,6 +15,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.List;
+
 @Service
 public class UserProfileService {
 
@@ -40,20 +42,18 @@ public class UserProfileService {
         return getLatLong(request.getAddress())
                 .flatMap(latLng -> saveLocationToDB(latLng, request.getUserId()))
                 .flatMap(locationResponse -> {
-                    // 1. Build the entity
                     UserProfile userProfile = UserProfile.builder()
                             .userId(request.getUserId())
                             .fullName(request.getFullName())
                             .age(request.getAge())
                             .address(request.getAddress())
                             .email(request.getEmail())
-                            .locationId(locationResponse.getLocationId())
+                            .locationId(locationResponse.getLocationId()) // Using ID from location-service
                             .phoneNumber(request.getPhoneNumber())
                             .examStage(request.getExamStage())
                             .build();
 
-                    // 2. Wrap the blocking JPA call in a Mono
-                    // 3. Move execution to the boundedElastic scheduler
+                    // Move the blocking JPA save to the dedicated thread pool
                     return Mono.fromCallable(() -> userProfileRepository.save(userProfile))
                             .subscribeOn(Schedulers.boundedElastic());
                 });
@@ -107,4 +107,6 @@ public class UserProfileService {
                             .build();
                 });
     }
+
+
 }

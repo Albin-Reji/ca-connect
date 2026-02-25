@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -24,37 +25,41 @@ public class LocationService {
         this.locationRepository = locationRepository;
         this.userServiceWebClient = userServiceWebClient;
     }
-
-    public Location getLocationByUserId(String userId) {
-        return locationRepository.getByUserId(userId);
+    public Mono<Location> saveLocationToDB(LocationRequest locationRequest) {
+        return isUserExist(locationRequest.getUserId())
+                .defaultIfEmpty(false)
+                .onErrorReturn(false) // ← handles 404/500 from user-service too
+                .flatMap(exists -> {
+                    if (Boolean.FALSE.equals(exists)) {
+                        return Mono.error(new UserNotFoundException("UserId is Invalid"));
+                    }
+                    Location location = Location.builder()
+                            .userId(locationRequest.getUserId())
+                            .latitude(locationRequest.getLatitude())
+                            .longitude(locationRequest.getLongitude())
+                            .build();
+                    // JPA is blocking → offload to boundedElastic
+                    return Mono.fromCallable(() -> locationRepository.save(location))
+                            .subscribeOn(Schedulers.boundedElastic());
+                });
     }
 
-    public Location saveLocationToDB(LocationRequest locationRequest) {
-        /* check the user exist in user DB*/
-        Boolean isUserExistByUserId=isUserExist(locationRequest.getUserId()).block();
-
-        if(Boolean.FALSE.equals(isUserExistByUserId)){
-            throw new UserNotFoundException("UserId is Invalid :: InvalidLocationIdException");
-        }
-        Location location=Location.builder()
-                .userId(locationRequest.getUserId())
-                .latitude(locationRequest.getLatitude())
-                .longitude(locationRequest.getLongitude())
-                .build();
-        return locationRepository.save(location);
+    public Mono<Location> getLocationByUserId(String userId) {
+        return Mono.fromCallable(() -> locationRepository.getByUserId(userId))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
-    public List<Location> getNearestLocation(LatLonLimitRequest latLonLimitRequest) {
-        return locationRepository.getNearestLocation(
-                latLonLimitRequest.getLatitude(),
-                latLonLimitRequest.getLongitude(),
-                latLonLimitRequest.getLimit());
+    public Mono<Location> getLocationByLocationId(String locationId) {
+        return Mono.fromCallable(() ->
+                locationRepository.findByLocationId(locationId)
+                        .orElseThrow(() -> new InvalidLocationIdException("Location Id Not Found"))
+        ).subscribeOn(Schedulers.boundedElastic());
     }
 
-    public Location getLocationByLocationId(String locationId) {
-        return locationRepository.findByLocationId(locationId)
-                .orElseThrow(()->
-                        new InvalidLocationIdException("Location Id Not Found....."));
+    public Mono<List<Location>> getNearestLocation(LatLonLimitRequest req) {
+        return Mono.fromCallable(() ->
+                locationRepository.getNearestLocation(req.getLatitude(), req.getLongitude(), req.getLimit())
+        ).subscribeOn(Schedulers.boundedElastic());
     }
     /* checking whether user exist for this fucntion()
         saveLocationToDB(LocationRequest locationRequest)
