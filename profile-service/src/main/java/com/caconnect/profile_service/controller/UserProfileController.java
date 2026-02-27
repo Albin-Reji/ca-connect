@@ -1,5 +1,6 @@
 package com.caconnect.profile_service.controller;
 
+import com.caconnect.profile_service.dto.Location;
 import com.caconnect.profile_service.dto.UserProfileRequest;
 import com.caconnect.profile_service.model.UserProfile;
 import com.caconnect.profile_service.service.UserProfileService;
@@ -27,4 +28,10 @@ public class UserProfileController {
         return ResponseEntity.ok(userProfileService.getUserProfile(userId));
     }
 
+    @GetMapping("/users/{userId}/nearest/{limit}")
+    public Mono<ResponseEntity<List<Location>>> getNearestUsersOfSameExamStage(@PathVariable("userId") String userId,
+                                                                         @PathVariable("limit") Integer limit){
+        return userProfileService.getNearestUsersOfSameExamStage(userId, limit)
+                .map(ResponseEntity::ok);
+    }
 }

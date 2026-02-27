@@ -5,6 +5,7 @@ import com.caconnect.location_service.dto.LocationRequest;
 import com.caconnect.location_service.exception.InvalidLocationIdException;
 import com.caconnect.location_service.exception.UserNotFoundException;
 import com.caconnect.location_service.model.Location;
+import com.caconnect.location_service.model.NearestExamStageRequest;
 import com.caconnect.location_service.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -69,5 +70,14 @@ public class LocationService {
                 .uri("/api/users/userId/{userId}", userId)
                 .retrieve()
                 .bodyToMono(Boolean.class);
+    }
+
+    public List<Location> getNearestLocationByExamStage(NearestExamStageRequest request) {
+        return locationRepository.findNearestByUserIds(
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getLimit(),
+                request.getUserIds()
+        );
     }
 }

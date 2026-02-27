@@ -8,6 +8,7 @@ import com.caconnect.profile_service.model.Address;
 import com.caconnect.profile_service.model.UserProfile;
 import com.caconnect.profile_service.repository.UserProfileRepository;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserProfileService {
 
@@ -60,7 +62,7 @@ public class UserProfileService {
     }
 
     public UserProfile getUserProfile(String userId) {
-        return userProfileRepository.getByUserId(userId);
+        return userProfileRepository.findByUserId(userId);
     }
 
     public Mono<Location> saveLocationToDB(LatitudeLongitude latitudeLongitude, String userId){
@@ -109,4 +111,46 @@ public class UserProfileService {
     }
 
 
+    public Mono<List<Location>> getNearestUsersOfSameExamStage(
+            String userId,
+            Integer limit
+    ) {
+
+        return Mono.fromCallable(() ->
+                        userProfileRepository.findByUserId(userId)
+                )
+                .flatMap(currUserProfile ->
+
+                        locationWebClient.get()
+                                .uri("/users/{userId}/location", userId)
+                                .retrieve()
+                                .bodyToMono(Location.class)
+
+                                .flatMap(currentUserLocation -> {
+
+                                    List<UserProfile> stageProfiles =
+                                            userProfileRepository.findAllByExamStage(
+                                                    currUserProfile.getExamStage()
+                                            );
+                                    log.info("STAGED USERPROFILE: {}",stageProfiles);
+                                    List<String> stageUserIds = stageProfiles.stream()
+                                            .map(UserProfile::getUserId)
+                                            .filter(id -> !id.equals(userId))
+                                            .toList();
+                                    log.info("USERIDS OF SAME EXAM STAGE: {}",stageUserIds);
+
+                                    return locationWebClient.get()
+                                            .uri(uriBuilder -> uriBuilder
+                                                    .path("/nearestby/examstage")
+                                                    .queryParam("latitude", currentUserLocation.getLatitude())
+                                                    .queryParam("longitude", currentUserLocation.getLongitude())
+                                                    .queryParam("limit", limit)
+                                                    .queryParam("userIds", stageUserIds)
+                                                    .build())
+                                            .retrieve()
+                                            .bodyToFlux(Location.class)
+                                            .collectList();
+                                })
+                );
+    }
 }
