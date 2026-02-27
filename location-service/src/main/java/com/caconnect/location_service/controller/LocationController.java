@@ -3,14 +3,17 @@ package com.caconnect.location_service.controller;
 import com.caconnect.location_service.dto.LatLonLimitRequest;
 import com.caconnect.location_service.dto.LocationRequest;
 import com.caconnect.location_service.model.Location;
+import com.caconnect.location_service.model.NearestExamStageRequest;
 import com.caconnect.location_service.service.LocationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/locations")
 @RequiredArgsConstructor
@@ -40,5 +43,9 @@ public class LocationController {
     public Mono<ResponseEntity<List<Location>>> getNearestLocation(@ModelAttribute LatLonLimitRequest request) {
         return locationService.getNearestLocation(request)
                 .map(ResponseEntity::ok);
+    }
+    @GetMapping("/nearestby/examstage")
+    public ResponseEntity<List<Location>> getNearestLocationByExamStage(@ModelAttribute NearestExamStageRequest request){
+        return ResponseEntity.ok(locationService.getNearestLocationByExamStage(request));
     }
 }

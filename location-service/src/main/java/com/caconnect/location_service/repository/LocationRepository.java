@@ -27,4 +27,22 @@ public interface LocationRepository extends JpaRepository<Location, String> {
     );
 
     Optional<Location> findByLocationId(String locationId);
+
+    @Query(value = """
+        SELECT *
+        FROM location
+        WHERE user_id IN (:userIds)
+        ORDER BY earth_distance(
+            ll_to_earth(:lat, :lon),
+            ll_to_earth(latitude, longitude)
+        )
+        LIMIT :limit
+        """,
+            nativeQuery = true)
+    List<Location> findNearestByUserIds(
+            @Param("lat") double lat,
+            @Param("lon") double lon,
+            @Param("limit") Integer limit,
+            @Param("userIds") List<String> userIds
+    );
 }
