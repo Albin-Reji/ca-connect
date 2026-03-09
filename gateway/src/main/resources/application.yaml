@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8090/realms/ca-connect/protocol/openid-connect/certs
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/api/users/**
+
+            - id: profile-service
+              uri: lb://PROFILE-SERVICE
+              predicates:
+                  - Path=/api/profiles/**
+
+            - id: location-service
+              uri: lb://LOCATION-SERVICE
+              predicates:
+                - Path=/api/locations/**
+
+
+
+
+
+#eureka configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+#server port
+server:
+  port: 8080
