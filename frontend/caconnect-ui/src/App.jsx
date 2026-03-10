@@ -1,36 +1,35 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Provider } from "react-redux";
-import { AuthProvider } from "react-oauth2-code-pkce";
-import { store } from "./store/store"; // your Redux store
-import HomePage from "./components/HomePage";
+/**
+ * App.jsx — Root component with React Router routes
+ */
 
-// ─── OAuth2 / PKCE Config ─────────────────────────────────────────────────────
-// Replace these values with your actual OAuth provider details
-const authConfig = {
-  clientId: "ca-connect",              // e.g. "ca-connect-web"
-  authorizationEndpoint: "http://localhost:8090/realms/ca-connect/protocol/openid-connect/auth",
-  tokenEndpoint: "http://localhost:8090/realms/ca-connect/protocol/openid-connect/token",
-  redirectUri: window.location.origin,     // e.g. http://localhost:3000
-  scope: "openid profile email",
-  onRefreshTokenExpire: (event) => event.logIn(), // auto re-login on refresh expiry
-};
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
+import Navbar from './components/layout/Navbar';
+import ToastStack from './components/ui/Toast';
 
-function App() {
+// Pages
+import Home         from './pages/Home';
+import CreateProfile from './pages/CreateProfile';
+import ProfileView  from './pages/ProfileView';
+import NearbyPeers  from './pages/NearbyPeers';
+
+export default function App() {
   return (
-    // 1. Redux store wraps everything
-    <Provider store={store}>
-      {/* 2. OAuth2 PKCE provider wraps Router so AuthContext is available everywhere */}
-      <AuthProvider authConfig={authConfig}>
-        <Router>
+    <AppProvider>
+      <BrowserRouter>
+        <Navbar />
+        <main style={{ minHeight: 'calc(100vh - 64px)' }}>
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            {/* Add more routes here */}
+            <Route path="/"                          element={<Home />} />
+            <Route path="/create-profile"            element={<CreateProfile />} />
+            <Route path="/profile/:userId"           element={<ProfileView />} />
+            <Route path="/profile/:userId/peers"     element={<NearbyPeers />} />
+            {/* Catch-all */}
+            <Route path="*"                          element={<Navigate to="/" replace />} />
           </Routes>
-        </Router>
-      </AuthProvider>
-    </Provider>
+        </main>
+        <ToastStack />
+      </BrowserRouter>
+    </AppProvider>
   );
 }
-
-export default App;
