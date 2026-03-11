@@ -42,7 +42,7 @@ public class UserProfile {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true)
     private String locationId;
 
     @CreationTimestamp
@@ -50,7 +50,4 @@ public class UserProfile {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-
-
 }

@@ -26,9 +26,15 @@ spring:
               predicates:
                 - Path=/api/locations/**
 
-
-
-
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 
 #eureka configuration
 eureka:

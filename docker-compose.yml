@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: caconnect-postgres
+    environment:
+      POSTGRES_DB: ca_connect_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - caconnect-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ca_connect_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Eureka Service Discovery
+  eureka:
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    container_name: caconnect-eureka
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - caconnect-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # User Service
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: caconnect-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_PASSWORD=${DB_PASSWORD:-postgres123}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://eureka:8761/eureka
+    networks:
+      - caconnect-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_started
+
+  # Location Service
+  location-service:
+    build:
+      context: ./location-service
+      dockerfile: Dockerfile
+    container_name: caconnect-location-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_PASSWORD=${DB_PASSWORD:-postgres123}
+      - GEO_CAGE_API_KEY=${GEO_CAGE_API_KEY}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://eureka:8761/eureka
+    networks:
+      - caconnect-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_started
+
+  # Profile Service
+  profile-service:
+    build:
+      context: ./profile-service
+      dockerfile: Dockerfile
+    container_name: caconnect-profile-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_PASSWORD=${DB_PASSWORD:-postgres123}
+      - GEO_CAGE_API_KEY=${GEO_CAGE_API_KEY}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://eureka:8761/eureka
+    networks:
+      - caconnect-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_started
+
+  # API Gateway
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: caconnect-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE=http://eureka:8761/eureka
+    networks:
+      - caconnect-network
+    depends_on:
+      eureka:
+        condition: service_started
+      user-service:
+        condition: service_started
+      location-service:
+        condition: service_started
+      profile-service:
+        condition: service_started
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend/caconnect-ui
+      dockerfile: Dockerfile
+    container_name: caconnect-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+      - VITE_USER_API_URL=http://localhost:8081
+      - VITE_LOCATION_API_URL=http://localhost:8082
+      - VITE_PROFILE_API=http://localhost:8083
+    networks:
+      - caconnect-network
+    depends_on:
+      gateway:
+        condition: service_started
+
+volumes:
+  postgres_data:
+
+networks:
+  caconnect-network:
+    driver: bridge

@@ -9,7 +9,7 @@ import { createContext, useContext, useReducer, useCallback } from 'react';
 
 // ── Initial state ─────────────────────────────────────────────────
 const initialState = {
-  userId: localStorage.getItem('userId') || '',
+  userId: localStorage.getItem('caconnect_userId') || '',
   profileCache: {},   // userId → UserProfile
   toasts: [],
 };

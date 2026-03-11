@@ -100,7 +100,7 @@ export default function CreateProfile() {
         age: Number(form.age),
         examStage: form.examStage,
         address: {
-          streetAddress: form.streetAddress.trim() || null,
+          // streetAddress: form.streetAddress.trim() || null,
           city: form.city.trim(),
           state: form.state.trim(),
           country: form.country.trim(),
@@ -189,10 +189,10 @@ export default function CreateProfile() {
           </div>
 
           {/* ── Address ── */}
-          <SectionTitle>📍 Address</SectionTitle>
+          {/* <SectionTitle>📍 Address</SectionTitle>
           <Field label="Street Address" error={errors.streetAddress} hint="Optional — used for precise geolocation">
             <Input value={form.streetAddress} onChange={set('streetAddress')} placeholder="123 MG Road" />
-          </Field>
+          </Field> */}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18 }}>
             <Field label="City" required error={errors.city}>

@@ -1,9 +1,13 @@
-/**
- * Navbar.jsx — Top navigation bar for CAConnect
+/** 
+ * Navbar.jsx — Top navigation bar for CAConnect 
  */
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+
+import { AuthContext } from 'react-oauth2-code-pkce';
+import { useDispatch } from 'react-redux';
+import { setCredential, logout } from '../../store/authSlice';
 
 const NavLink = ({ to, children }) => {
   const { pathname } = useLocation();
@@ -26,7 +30,27 @@ const NavLink = ({ to, children }) => {
 };
 
 export default function Navbar() {
-  const { state } = useApp();
+
+
+  const { state, dispatchs } = useApp();
+  const navigate = useNavigate();
+  const { token, tokenData, logIn, logOut } = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const [authReady, setAuthReady] = useState(false);
+
+  // logout code
+
+  const handleLogout = () => {
+    dispatch(logout());
+    logOut();
+  }
+
+  useEffect(() => {
+    if (token) {
+      dispatch(setCredential({ token, user: tokenData }))
+      setAuthReady(true);
+    }
+  }, [token, tokenData, dispatch]);
 
   return (
     <nav style={{
@@ -70,35 +94,78 @@ export default function Navbar() {
           </>
         )}
 
-        {/* User badge */}
+        {/* User badge + auth buttons */}
         {state.userId ? (
-          <div style={{
-            marginLeft: 12,
-            background: 'rgba(245,158,11,0.15)',
-            border: '1px solid rgba(245,158,11,0.3)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '4px 12px',
-            fontSize: '0.75rem', fontWeight: 500,
-            color: 'var(--amber-lt)',
-            letterSpacing: '0.03em',
-          }}>
-            ID: {state.userId.slice(0, 8)}…
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 12 }}>
+            <div style={{
+              background: 'rgba(245,158,11,0.15)',
+              border: '1px solid rgba(245,158,11,0.3)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '4px 12px',
+              fontSize: '0.75rem', fontWeight: 500,
+              color: 'var(--amber-lt)',
+              letterSpacing: '0.03em',
+            }}>
+              ID: {state.userId.slice(0, 8)}…
+            </div>
+            <button
+              onClick={handleLogout}
+              style={{
+                background: 'transparent',
+                color: 'rgba(255,255,255,0.65)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '6px 14px',
+                fontSize: '0.8rem', fontWeight: 500,
+                letterSpacing: '0.02em',
+                cursor: 'pointer',
+                transition: 'all var(--transition)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = 'rgba(239,68,68,0.5)';
+                e.currentTarget.style.color = '#FCA5A5';
+                e.currentTarget.style.background = 'rgba(239,68,68,0.08)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                e.currentTarget.style.color = 'rgba(255,255,255,0.65)';
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              Log Out
+            </button>
           </div>
         ) : (
-          <Link to="/create-profile" style={{
-            marginLeft: 12,
-            background: 'var(--amber)',
-            color: 'var(--navy)',
-            border: 'none',
-            borderRadius: 'var(--radius-sm)',
-            padding: '8px 18px',
-            fontSize: '0.8rem', fontWeight: 600,
-            letterSpacing: '0.02em',
-            display: 'inline-block',
-            transition: 'all var(--transition)',
-          }}>
-            Get Started
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 12 }}>
+            <Link to="/login" style={{
+              background: 'transparent',
+              color: 'rgba(255,255,255,0.75)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '7px 16px',
+              fontSize: '0.8rem', fontWeight: 500,
+              letterSpacing: '0.02em',
+              display: 'inline-block',
+              transition: 'all var(--transition)',
+              textDecoration: 'none',
+            }}>
+              Log In
+            </Link>
+            <Link to="/create-profile" style={{
+              background: 'var(--amber)',
+              color: 'var(--navy)',
+              border: 'none',
+              borderRadius: 'var(--radius-sm)',
+              padding: '8px 18px',
+              fontSize: '0.8rem', fontWeight: 600,
+              letterSpacing: '0.02em',
+              display: 'inline-block',
+              transition: 'all var(--transition)',
+              textDecoration: 'none',
+            }}>
+              Get Started
+            </Link>
+          </div>
         )}
       </div>
     </nav>

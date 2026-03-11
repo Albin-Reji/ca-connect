@@ -5,12 +5,14 @@ import com.caconnect.profile_service.dto.UserProfileRequest;
 import com.caconnect.profile_service.model.UserProfile;
 import com.caconnect.profile_service.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/profiles")
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class UserProfileController {
 
     @PostMapping("/")
     public Mono<UserProfile> saveUserProfile(@RequestBody UserProfileRequest request){
+        log.info("request from frontend: "+request.toString());
         return userProfileService.saveUserProfile(request);
     }
 

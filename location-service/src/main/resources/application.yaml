@@ -13,6 +13,15 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 
 # eureka client config
 eureka:
@@ -25,3 +34,8 @@ eureka:
 # port configuration
 server:
   port: 8082
+
+# OpenCage Geocoding API
+geoCage:
+  api:
+    key: ${GEO_CAGE_API_KEY}

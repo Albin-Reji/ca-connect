@@ -29,15 +29,15 @@ public class UserProfileService {
     @Value("${geoCage.api.key}")
     private String geoCageApiKey;
 
+    // Single clean constructor for the beans
     public UserProfileService(
             @Qualifier("geoWebClient") WebClient geoWebClient,
             @Qualifier("locationWebClient") WebClient locationWebClient,
             UserProfileRepository userProfileRepository
     ) {
-
         this.geoWebClient = geoWebClient;
         this.locationWebClient = locationWebClient;
-        this.userProfileRepository=userProfileRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     public Mono<UserProfile> saveUserProfile(UserProfileRequest request) {

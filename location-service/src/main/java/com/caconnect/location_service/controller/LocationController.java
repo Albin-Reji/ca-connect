@@ -33,9 +33,16 @@ public class LocationController {
                 .map(ResponseEntity::ok);
     }
 
-    @GetMapping("/{locationId}")
-    public Mono<ResponseEntity<Location>> getLocationByLocationId(@PathVariable String locationId) {
-        return locationService.getLocationByLocationId(locationId)
+    @PutMapping("/users/{userId}/location")
+    public Mono<ResponseEntity<Location>> updateLocationByUserId(@PathVariable String userId,
+            @RequestBody LocationRequest locationRequest) {
+        return locationService.updateLocationByUserId(userId, locationRequest)
+                .map(ResponseEntity::ok);
+    }
+
+    @DeleteMapping("/users/{userId}/location")
+    public Mono<ResponseEntity<Void>> deleteLocationByUserId(@PathVariable String userId) {
+        return locationService.deleteLocationByUserId(userId)
                 .map(ResponseEntity::ok);
     }
 
@@ -44,8 +51,10 @@ public class LocationController {
         return locationService.getNearestLocation(request)
                 .map(ResponseEntity::ok);
     }
+
     @GetMapping("/nearestby/examstage")
-    public ResponseEntity<List<Location>> getNearestLocationByExamStage(@ModelAttribute NearestExamStageRequest request){
+    public ResponseEntity<List<Location>> getNearestLocationByExamStage(
+            @ModelAttribute NearestExamStageRequest request) {
         return ResponseEntity.ok(locationService.getNearestLocationByExamStage(request));
     }
 }
