@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, String> {
 
-    Location getByUserId(String userId);
+    Location getByKeyCloakId(String keyCloakId);
 
     @Query(value = """
             SELECT * FROM location
@@ -31,7 +31,7 @@ public interface LocationRepository extends JpaRepository<Location, String> {
     @Query(value = """
         SELECT *
         FROM location
-        WHERE user_id IN (:userIds)
+        WHERE key_cloak_id IN (:keyCloakIds)
         ORDER BY earth_distance(
             ll_to_earth(:lat, :lon),
             ll_to_earth(latitude, longitude)
@@ -43,6 +43,6 @@ public interface LocationRepository extends JpaRepository<Location, String> {
             @Param("lat") double lat,
             @Param("lon") double lon,
             @Param("limit") Integer limit,
-            @Param("userIds") List<String> userIds
+            @Param("userIds") List<String> keyCloakIds
     );
 }

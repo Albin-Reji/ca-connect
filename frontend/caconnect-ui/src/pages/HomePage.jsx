@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredential, logout } from "./../store/authSlice";
-
+import { Link } from "react-router-dom";
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
 fontLink.rel = "stylesheet";
@@ -477,13 +477,72 @@ export default function HomePage() {
 
         window.location.href = registerUrl;
     };
+<<<<<<< HEAD:frontend/caconnect-ui/src/pages/HomePage.jsx
 
     const reduxUserId = useSelector((state) => state.auth.userId);
 
+=======
+    /*navigation links */
+    const navLinks = [
+        { name: "Study Resources", path: "/study-materials" },
+        { name: "Community", path: "/community" },
+        { name: "Mentorship", path: "/mentorship" },
+        { name: "Create Profile", path: "/create-profile" },
+        { name: "Exam Info", path: "/exam-info" }
+    ];
+>>>>>>> main:frontend/caconnect-ui/src/components/HomePage.jsx
     return (
         <>
             <style>{css}</style>
 
+<<<<<<< HEAD:frontend/caconnect-ui/src/pages/HomePage.jsx
+=======
+            {/* ── NAVBAR ── */}
+            <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
+                <div className="nav-inner">
+                    <a className="nav-logo" href="#">
+                        <span style={{ background: "linear-gradient(135deg,#c9a84c,#e8c97a)", borderRadius: "10px", width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#0a1628", fontWeight: 900 }}>CA</span>
+                        Connect<span className="dot">.</span>
+                    </a>
+
+
+
+                    <ul className="nav-links">
+                        {navLinks.map((link) => (
+                            <li key={link.name}>
+                                <Link to={link.path}>{link.name}</Link>
+                            </li>
+                        ))}
+                    </ul>
+
+                    <div className="nav-actions">
+                        {isLoggedIn ? (
+                            /* ── Logged-in state: avatar pill + logout ── */
+                            <>
+                                <div className="nav-user-pill">
+                                    <div className="nav-avatar">{initials || "U"}</div>
+                                    <span className="nav-user-name">Hi, {displayName}</span>
+                                </div>
+                                <button className="nav-logout" onClick={handleLogout}>
+                                    Log Out
+                                </button>
+                            </>
+                        ) : (
+                            /* ── Logged-out state: login + register ── */
+                            <>
+                                <button className="nav-login" onClick={() => logIn()}>
+                                    Log In
+                                </button>
+                                <button className="nav-register" onClick={handleRegister}>
+                                    Register Free
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </nav>
+
+>>>>>>> main:frontend/caconnect-ui/src/components/HomePage.jsx
             {/* ── HERO ── */}
             <section className="hero noise">
                 <div className="hero-orb orb1" />

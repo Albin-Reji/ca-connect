@@ -22,19 +22,19 @@ public class UserProfileController {
 
     @PostMapping("/")
     public Mono<UserProfile> saveUserProfile(@RequestBody UserProfileRequest request){
-        log.info("request from frontend: "+request.toString());
+        log.info("frontend request: \n"+ request.toString());
         return userProfileService.saveUserProfile(request);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<UserProfile> getUserProfile(@PathVariable("userId") String userId){
-        return ResponseEntity.ok(userProfileService.getUserProfile(userId));
+    @GetMapping("/users/{keyCloakId}")
+    public ResponseEntity<UserProfile> getUserProfile(@PathVariable("keyCloakId") String keyCloakId){
+        return ResponseEntity.ok(userProfileService.getUserProfile(keyCloakId));
     }
 
-    @GetMapping("/users/{userId}/nearest/{limit}")
-    public Mono<ResponseEntity<List<Location>>> getNearestUsersOfSameExamStage(@PathVariable("userId") String userId,
+    @GetMapping("/users/{keyCloakId}/nearest/{limit}")
+    public Mono<ResponseEntity<List<Location>>> getNearestUsersOfSameExamStage(@PathVariable("keyCloakId") String keyCloakId,
                                                                          @PathVariable("limit") Integer limit){
-        return userProfileService.getNearestUsersOfSameExamStage(userId, limit)
+        return userProfileService.getNearestUsersOfSameExamStage(keyCloakId, limit)
                 .map(ResponseEntity::ok);
     }
 }

@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, String > {
 
     Boolean existsByKeyCloakId(String keyCloakId);
+
+    User getReferenceByKeyCloakId(String keyCloakId);
 }
