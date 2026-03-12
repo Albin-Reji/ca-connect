@@ -22,7 +22,7 @@ public class UserProfile {
     private String profileId;
 
     @Column(unique = true, nullable = false)
-    private String userId;
+    private String keyCloakId;
 
     @Column(nullable = false)
     private String fullName;

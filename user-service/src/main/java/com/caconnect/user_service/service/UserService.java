@@ -34,8 +34,8 @@ public class UserService {
     }
 
 
-    public UserResponse getUserById(String userId) {
-        User user=userRepository.getReferenceById(userId);
+    public UserResponse getUserById(String keyCloakId) {
+        User user=userRepository.getReferenceByKeyCloakId(keyCloakId);
         return mapToUserResponse(user);
 
     }
@@ -59,7 +59,8 @@ public class UserService {
     }
 
 
-    public Boolean isUserExistByUserId(String userId) {
-        return userRepository.existsById(userId);
+    public Boolean isUserExistBykeyCloakId(String keyCloakId) {
+        return userRepository.existsByKeyCloakId(keyCloakId);
     }
 }
+

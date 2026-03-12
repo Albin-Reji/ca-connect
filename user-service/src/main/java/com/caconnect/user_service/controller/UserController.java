@@ -57,18 +57,18 @@ public class UserController {
     /**
      * Retrieves user information by user ID.
      *
-     * @param userId unique identifier of the user
+     * @param keyCloakId unique identifier of the user
      * @return ApiResponse containing user details
      */
-    @GetMapping("/{userId}")
+    @GetMapping("/{keyCloakId}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(
-            @PathVariable("userId") String userId) {
+            @PathVariable("keyCloakId") String keyCloakId) {
 
-        log.info("Fetching user with id: {}", userId);
+        log.info("Fetching user with id: {}", keyCloakId);
 
         return ApiResponses.ok(
-                userService.getUserById(userId),
-                String.format("Fetch User id %s From USERS DB", userId)
+                userService.getUserById(keyCloakId),
+                String.format("Fetch User id %s From USERS DB", keyCloakId)
         );
     }
 
@@ -91,8 +91,8 @@ public class UserController {
                 userService.validateUserByKeyCloakId(keyCloakId)
         );
     }
-    @GetMapping("/userId/{userId}")
-    public ResponseEntity<Boolean> isUserExistByUserId(@PathVariable("userId") String userId){
-        return ResponseEntity.ok(userService.isUserExistByUserId(userId));
+    @GetMapping("/userId/{keyCloakId}")
+    public ResponseEntity<Boolean> isUserExistByUserId(@PathVariable("keyCloakId") String keyCloakId){
+        return ResponseEntity.ok(userService.isUserExistBykeyCloakId(keyCloakId));
     }
 }

@@ -9,7 +9,7 @@ import lombok.Data;
 @Builder
 public class UserProfileRequest {
 
-    private String userId;
+    private String keyCloakId;
     private String fullName;
     private Integer age;
     private ExamStage examStage;

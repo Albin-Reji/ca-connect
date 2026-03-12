@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 public class Location {
     private String locationId;
-    private String userId;
+    private String keyCloakId;
     private Double latitude;
     private Double longitude;
 
