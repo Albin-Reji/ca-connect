@@ -9,6 +9,7 @@ import Mentorship from "./components/pages/Mentorship";
 import Community from "./components/pages/Community";
 import CreateProfileForm from "./components/pages/CreateprofileForm";
 import UserProfileRouter from "./components/pages/UserProfileRouter";
+import NearestUsersPage from "./components/pages/NearestUserPage";
 
 // ─── OAuth2 / PKCE Config ─────────────────────────────────────────────────────
 // Replace these values with your actual OAuth provider details
@@ -64,6 +65,14 @@ function App() {
               path="/view-user"
               element={
                 <UserProfileRouter />
+              }
+            />
+            
+            {/* - view user */}
+            <Route
+              path="/nearby"
+              element={
+                <NearestUsersPage />
               }
             />
           </Routes>

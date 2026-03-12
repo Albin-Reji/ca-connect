@@ -480,7 +480,7 @@ export default function HomePage() {
         { name: "Study Resources", path: "/study-materials" },
         { name: "Community", path: "/community" },
         { name: "Mentorship", path: "/mentorship" },
-        { name: "Create Profile", path: "/create-profile" },
+        { name: "Nearest Users", path: "/nearby" },
         { name: "View User", path: "/view-user" }
     ];
     return (

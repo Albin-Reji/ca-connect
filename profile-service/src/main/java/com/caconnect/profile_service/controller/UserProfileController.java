@@ -32,11 +32,16 @@ public class UserProfileController {
     }
 
     @GetMapping("/users/{keyCloakId}/nearest/{limit}")
-    public Mono<ResponseEntity<List<Location>>> getNearestUsersOfSameExamStage(@PathVariable("keyCloakId") String keyCloakId,
-                                                                         @PathVariable("limit") Integer limit){
-        return userProfileService.getNearestUsersOfSameExamStage(keyCloakId, limit)
+    public Mono<ResponseEntity<List<Location>>> getNearestUsersOfSameExamStage(
+            @PathVariable("keyCloakId") String keyCloakId,
+            @PathVariable("limit") Integer limit,
+            @RequestParam(value = "examStage", required = false) String examStage) {
+
+        log.info("Searching nearby User: {} limit: {} examStage: {}", keyCloakId, limit, examStage);
+        return userProfileService.getNearestUsersOfSameExamStage(keyCloakId, limit, examStage)
                 .map(ResponseEntity::ok);
     }
+
     @GetMapping("/users/{keyCloakId}/exist")
     public ResponseEntity<Boolean> isUserWithKeyCloakIdExist(@PathVariable("keyCloakId") String keyCloakId){
         log.info(" @GetMapping(\"/users/{keyCloakId}/exist\") from FRONTEND---");

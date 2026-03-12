@@ -5,6 +5,7 @@ import com.caconnect.profile_service.dto.Location;
 import com.caconnect.profile_service.dto.LocationRequest;
 import com.caconnect.profile_service.dto.UserProfileRequest;
 import com.caconnect.profile_service.model.Address;
+import com.caconnect.profile_service.model.ExamStage;
 import com.caconnect.profile_service.model.UserProfile;
 import com.caconnect.profile_service.repository.UserProfileRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -114,39 +115,62 @@ public class UserProfileService {
 
     public Mono<List<Location>> getNearestUsersOfSameExamStage(
             String keyCloakId,
-            Integer limit
+            Integer limit,
+            String examStageParam          // null/"MY_STAGE" → own stage, "ALL" → everyone
     ) {
-
-        return Mono.fromCallable(() ->
-                        userProfileRepository.findByKeyCloakId(keyCloakId)
-                )
+        return Mono.fromCallable(() -> userProfileRepository.findByKeyCloakId(keyCloakId))
                 .flatMap(currUserProfile ->
-
                         locationWebClient.get()
                                 .uri("/api/locations/users/{keyCloakId}/location", keyCloakId)
                                 .retrieve()
                                 .bodyToMono(Location.class)
-
                                 .flatMap(currentUserLocation -> {
 
-                                    List<UserProfile> stageProfiles =
-                                            userProfileRepository.findAllByExamStage(
-                                                    currUserProfile.getExamStage()
-                                            );
-                                    log.info("STAGED USERPROFILE: {}",stageProfiles);
-                                    List<String> stageKeyCloakIds = stageProfiles.stream()
+                                    // ── ALL: no stage filter, use the simple nearest endpoint ──
+                                    if ("ALL".equalsIgnoreCase(examStageParam)) {
+                                        return locationWebClient.get()
+                                                .uri(uriBuilder -> uriBuilder
+                                                        .path("/api/locations/nearest")
+                                                        .queryParam("latitude",  currentUserLocation.getLatitude())
+                                                        .queryParam("longitude", currentUserLocation.getLongitude())
+                                                        .queryParam("limit", limit + 1) // +1 to account for self
+                                                        .build())
+                                                .retrieve()
+                                                .bodyToFlux(Location.class)
+                                                // exclude the requesting user from results
+                                                .filter(loc -> !loc.getKeyCloakId().equals(keyCloakId))
+                                                .take(limit)
+                                                .collectList();
+                                    }
+
+                                    // ── Specific stage or MY_STAGE ──
+                                    ExamStage targetStage;
+                                    if (examStageParam == null || "MY_STAGE".equalsIgnoreCase(examStageParam)) {
+                                        targetStage = currUserProfile.getExamStage();
+                                    } else {
+                                        targetStage = ExamStage.valueOf(examStageParam.toUpperCase());
+                                    }
+
+                                    List<String> stageKeyCloakIds = userProfileRepository
+                                            .findAllByExamStage(targetStage)
+                                            .stream()
                                             .map(UserProfile::getKeyCloakId)
                                             .filter(id -> !id.equals(keyCloakId))
                                             .toList();
-                                    log.info("KeyCloakId OF SAME EXAM STAGE: {}",stageKeyCloakIds);
+
+                                    log.info("Stage: {} | IDs: {}", targetStage, stageKeyCloakIds);
+
+                                    if (stageKeyCloakIds.isEmpty()) {
+                                        return Mono.just(List.of());
+                                    }
 
                                     return locationWebClient.get()
                                             .uri(uriBuilder -> uriBuilder
                                                     .path("/api/locations/nearestby/examstage")
-                                                    .queryParam("latitude", currentUserLocation.getLatitude())
-                                                    .queryParam("longitude", currentUserLocation.getLongitude())
-                                                    .queryParam("limit", limit)
-                                                    .queryParam("keyCloakIds", stageKeyCloakIds)
+                                                    .queryParam("latitude",    currentUserLocation.getLatitude())
+                                                    .queryParam("longitude",   currentUserLocation.getLongitude())
+                                                    .queryParam("limit",       limit)
+                                                    .queryParam("keyCloakIds", stageKeyCloakIds.toArray())
                                                     .build())
                                             .retrieve()
                                             .bodyToFlux(Location.class)

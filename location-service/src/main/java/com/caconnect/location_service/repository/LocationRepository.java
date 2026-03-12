@@ -43,6 +43,6 @@ public interface LocationRepository extends JpaRepository<Location, String> {
             @Param("lat") double lat,
             @Param("lon") double lon,
             @Param("limit") Integer limit,
-            @Param("userIds") List<String> keyCloakIds
+            @Param("keyCloakIds") List<String> keyCloakIds
     );
 }
