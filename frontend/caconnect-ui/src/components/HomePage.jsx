@@ -481,7 +481,7 @@ export default function HomePage() {
         { name: "Community", path: "/community" },
         { name: "Mentorship", path: "/mentorship" },
         { name: "Create Profile", path: "/create-profile" },
-        { name: "Exam Info", path: "/exam-info" }
+        { name: "View User", path: "/view-user" }
     ];
     return (
         <>

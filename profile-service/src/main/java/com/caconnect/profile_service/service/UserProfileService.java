@@ -154,4 +154,8 @@ public class UserProfileService {
                                 })
                 );
     }
+
+    public Boolean isUserWithKeyCloakIdExist(String keyCloakId) {
+        return userProfileRepository.existsByKeyCloakId(keyCloakId);
+    }
 }

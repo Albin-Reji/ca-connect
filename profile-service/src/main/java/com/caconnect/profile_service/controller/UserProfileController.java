@@ -37,4 +37,9 @@ public class UserProfileController {
         return userProfileService.getNearestUsersOfSameExamStage(keyCloakId, limit)
                 .map(ResponseEntity::ok);
     }
+    @GetMapping("/users/{keyCloakId}/exist")
+    public ResponseEntity<Boolean> isUserWithKeyCloakIdExist(@PathVariable("keyCloakId") String keyCloakId){
+        log.info(" @GetMapping(\"/users/{keyCloakId}/exist\") from FRONTEND---");
+        return ResponseEntity.ok(userProfileService.isUserWithKeyCloakIdExist(keyCloakId));
+    }
 }

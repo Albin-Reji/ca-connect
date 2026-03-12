@@ -8,6 +8,7 @@ import StudyMaterials from "./components/pages/StudyMaterials";
 import Mentorship from "./components/pages/Mentorship";
 import Community from "./components/pages/Community";
 import CreateProfileForm from "./components/pages/CreateprofileForm";
+import UserProfileRouter from "./components/pages/UserProfileRouter";
 
 // ─── OAuth2 / PKCE Config ─────────────────────────────────────────────────────
 // Replace these values with your actual OAuth provider details
@@ -55,6 +56,14 @@ function App() {
               path="/create-profile"
               element={
                 <CreateProfileForm />
+              }
+            />
+
+            {/* - view user */}
+            <Route
+              path="/view-user"
+              element={
+                <UserProfileRouter />
               }
             />
           </Routes>

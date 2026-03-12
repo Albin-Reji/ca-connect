@@ -15,4 +15,6 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, String
     List<UserProfile> findAllByExamStage(ExamStage examStage);
 
     UserProfile findByKeyCloakId(String keyCloakId);
+
+    Boolean existsByKeyCloakId(String keyCloakId);
 }
