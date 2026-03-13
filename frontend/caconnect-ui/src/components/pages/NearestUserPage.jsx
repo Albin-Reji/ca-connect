@@ -191,31 +191,31 @@ const css = `
   }
 `;
 
-const STAGE_LABELS = { FOUNDATION:"Foundation", INTERMEDIATE:"Intermediate", ARTICLESHIP:"Articleship", FINAL:"Final", QUALIFIED:"Qualified" };
-const STAGE_ICONS  = { FOUNDATION:"📗", INTERMEDIATE:"📘", ARTICLESHIP:"💼", FINAL:"🏆", QUALIFIED:"⭐" };
-const AVATAR_COLORS = ["#c9a84c","#4ea8de","#63e6be","#a78bfa","#f472b6","#f77f00","#34d399"];
+const STAGE_LABELS = { FOUNDATION: "Foundation", INTERMEDIATE: "Intermediate", ARTICLESHIP: "Articleship", FINAL: "Final", QUALIFIED: "Qualified" };
+const STAGE_ICONS = { FOUNDATION: "📗", INTERMEDIATE: "📘", ARTICLESHIP: "💼", FINAL: "🏆", QUALIFIED: "⭐" };
+const AVATAR_COLORS = ["#c9a84c", "#4ea8de", "#63e6be", "#a78bfa", "#f472b6", "#f77f00", "#34d399"];
 
 // Stage pill options — "MY_STAGE" means use the logged-in user's own stage
 const STAGE_OPTIONS = [
-    { value: "MY_STAGE", label: "My Stage",     icon: "🎯" },
-    { value: "ALL",      label: "All",           icon: "🌐" },
-    { value: "FOUNDATION",   label: "Foundation",    icon: "📗" },
-    { value: "INTERMEDIATE", label: "Inter",         icon: "📘" },
-    { value: "ARTICLESHIP",  label: "Articleship",   icon: "💼" },
-    { value: "FINAL",        label: "Final",         icon: "🏆" },
-    { value: "QUALIFIED",    label: "Qualified",     icon: "⭐" },
+    { value: "MY_STAGE", label: "My Stage", icon: "🎯" },
+    { value: "ALL", label: "All", icon: "🌐" },
+    { value: "FOUNDATION", label: "Foundation", icon: "📗" },
+    { value: "INTERMEDIATE", label: "Inter", icon: "📘" },
+    { value: "ARTICLESHIP", label: "Articleship", icon: "💼" },
+    { value: "FINAL", label: "Final", icon: "🏆" },
+    { value: "QUALIFIED", label: "Qualified", icon: "⭐" },
 ];
 
 function getInitials(name = "") {
-    return name.split(" ").slice(0,2).map(n => n[0]?.toUpperCase()).join("") || "?";
+    return name.split(" ").slice(0, 2).map(n => n[0]?.toUpperCase()).join("") || "?";
 }
 function avatarColor(id = "") {
     return AVATAR_COLORS[id.charCodeAt(0) % AVATAR_COLORS.length];
 }
 function calcKm(lat1, lon1, lat2, lon2) {
-    const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+    const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
 }
 function formatAddress(profile) {
     if (!profile?.address) return null;
@@ -226,36 +226,36 @@ function formatAddress(profile) {
 function SkeletonCard() {
     return (
         <div className="skel-card">
-            <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
                 <div className="sk-circle" />
-                <div style={{ flex:1, display:"flex", flexDirection:"column", gap:8 }}>
-                    <div className="sk" style={{ height:12, width:"65%" }} />
-                    <div className="sk" style={{ height:10, width:"45%" }} />
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div className="sk" style={{ height: 12, width: "65%" }} />
+                    <div className="sk" style={{ height: 10, width: "45%" }} />
                 </div>
             </div>
-            <div style={{ display:"flex", gap:8, marginBottom:18 }}>
-                <div className="sk" style={{ height:22, width:80 }} />
-                <div className="sk" style={{ height:22, width:70 }} />
+            <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+                <div className="sk" style={{ height: 22, width: 80 }} />
+                <div className="sk" style={{ height: 22, width: 70 }} />
             </div>
-            {[100,80,90].map((w,i) => (
-                <div key={i} className="sk" style={{ height:11, width:`${w}%`, marginBottom:10 }} />
+            {[100, 80, 90].map((w, i) => (
+                <div key={i} className="sk" style={{ height: 11, width: `${w}%`, marginBottom: 10 }} />
             ))}
         </div>
     );
 }
 
-function UserCard({ location, profile, rank, myLat, myLon, animDelay }) {
-    const color    = avatarColor(location.keyCloakId);
+function UserCard({ location, profile, rank, myLat, myLon, animDelay, onMessageClick }) {
+    const color = avatarColor(location.keyCloakId);
     const initials = getInitials(profile?.fullName);
-    const dist     = (myLat != null && myLon != null && location.latitude && location.longitude)
+    const dist = (myLat != null && myLon != null && location.latitude && location.longitude)
         ? calcKm(myLat, myLon, location.latitude, location.longitude)
         : null;
-    const address  = formatAddress(profile);
+    const address = formatAddress(profile);
 
     return (
-        <div className="user-card" style={{ animationDelay:`${animDelay}s` }}>
+        <div className="user-card" style={{ animationDelay: `${animDelay}s` }}>
             <div className="card-top">
-                <div className="card-avatar" style={{ background:`${color}22` }}>
+                <div className="card-avatar" style={{ background: `${color}22` }}>
                     <span style={{ color }}>{initials}</span>
                     <div className="card-avatar-ring" />
                     <div className={`rank-badge ${rank <= 3 ? "top" : ""}`}>#{rank}</div>
@@ -263,7 +263,7 @@ function UserCard({ location, profile, rank, myLat, myLon, animDelay }) {
                 <div>
                     <div className="card-name">{profile?.fullName ?? "CA Member"}</div>
                     <div className="card-email">
-                        {profile?.email ?? `${location.keyCloakId.slice(0,20)}…`}
+                        {profile?.email ?? `${location.keyCloakId.slice(0, 20)}…`}
                     </div>
                 </div>
             </div>
@@ -282,7 +282,7 @@ function UserCard({ location, profile, rank, myLat, myLon, animDelay }) {
                 {address && (
                     <div className="card-field">
                         <span className="field-k">📍 Address</span>
-                        <span className="field-v" style={{ fontFamily:"var(--font-body)", maxWidth:"60%" }}>{address}</span>
+                        <span className="field-v" style={{ fontFamily: "var(--font-body)", maxWidth: "60%" }}>{address}</span>
                     </div>
                 )}
                 {profile?.phoneNumber && (
@@ -294,7 +294,12 @@ function UserCard({ location, profile, rank, myLat, myLon, animDelay }) {
             </div>
 
             <div className="card-footer">
-                <button className="btn-card-gold">✉️ Message</button>
+                <button
+                    className="btn-card-gold"
+                    onClick={() => onMessageClick(location.keyCloakId)}
+                >
+                    ✉️ Message
+                </button>
                 <button className="btn-card-outline">🔗 Profile</button>
             </div>
         </div>
@@ -305,14 +310,14 @@ export default function NearestUsersPage() {
     const { token, tokenData } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const [limit,      setLimit]      = useState(10);
-    const [examStage,  setExamStage]  = useState("MY_STAGE");
-    const [loading,    setLoading]    = useState(false);
-    const [results,    setResults]    = useState(null);
-    const [profiles,   setProfiles]   = useState({});
-    const [myLoc,      setMyLoc]      = useState(null);
-    const [error,      setError]      = useState(null);
-    const [myProfile,  setMyProfile]  = useState(null);
+    const [limit, setLimit] = useState(10);
+    const [examStage, setExamStage] = useState("MY_STAGE");
+    const [loading, setLoading] = useState(false);
+    const [results, setResults] = useState(null);
+    const [profiles, setProfiles] = useState({});
+    const [myLoc, setMyLoc] = useState(null);
+    const [error, setError] = useState(null);
+    const [myProfile, setMyProfile] = useState(null);
 
     const keyCloakId = tokenData?.sub;
 
@@ -349,9 +354,6 @@ export default function NearestUsersPage() {
         setLoading(true); setError(null); setResults(null); setProfiles({});
 
         try {
-            // Build URL — pass examStage as query param
-            // MY_STAGE → omit param (backend defaults to user's own stage)
-            // ALL or specific stage → pass as ?examStage=ALL / ?examStage=FINAL etc.
             let url = `http://localhost:8080/api/profiles/users/${keyCloakId}/nearest/${n}`;
             if (examStage !== "MY_STAGE") {
                 url += `?examStage=${examStage}`;
@@ -374,6 +376,10 @@ export default function NearestUsersPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleMessageClick = (userId) => {
+        navigate(`/chat/${userId}`);
     };
 
     const activeStageLabel = () => {
@@ -407,7 +413,6 @@ export default function NearestUsersPage() {
                     </div>
 
                     <div className="search-panel">
-                        {/* Row 1: limit + buttons */}
                         <div className="search-row">
                             <div className="field">
                                 <label className="field-label">
@@ -432,7 +437,6 @@ export default function NearestUsersPage() {
                             )}
                         </div>
 
-                        {/* Row 2: Stage selector */}
                         <div>
                             <div className="stage-selector-label">Filter by Exam Stage</div>
                             <div className="stage-pills">
@@ -448,9 +452,9 @@ export default function NearestUsersPage() {
                             </div>
                         </div>
 
-                        <div className="stage-strip" style={{ marginTop:16 }}>
+                        <div className="stage-strip" style={{ marginTop: 16 }}>
                             <div className="stage-dot" />
-                            Searching: <strong style={{ marginLeft:4 }}>{activeStageLabel()}</strong>
+                            Searching: <strong style={{ marginLeft: 4 }}>{activeStageLabel()}</strong>
                         </div>
                     </div>
 
@@ -465,8 +469,8 @@ export default function NearestUsersPage() {
                     {error && !loading && (
                         <div className="center-state">
                             <div className="error-box">
-                                <div style={{ fontSize:28, marginBottom:10 }}>⚠️</div>
-                                <div style={{ fontWeight:700, color:"var(--white)", marginBottom:8 }}>Search failed</div>
+                                <div style={{ fontSize: 28, marginBottom: 10 }}>⚠️</div>
+                                <div style={{ fontWeight: 700, color: "var(--white)", marginBottom: 8 }}>Search failed</div>
                                 <div>{error}</div>
                             </div>
                         </div>
@@ -498,6 +502,7 @@ export default function NearestUsersPage() {
                                         myLat={myLoc?.latitude}
                                         myLon={myLoc?.longitude}
                                         animDelay={idx * 0.06}
+                                        onMessageClick={handleMessageClick}
                                     />
                                 ))}
                             </div>
@@ -510,7 +515,7 @@ export default function NearestUsersPage() {
                             <div className="state-title">Ready to explore</div>
                             <div className="state-sub">
                                 Pick a stage filter and press{" "}
-                                <strong style={{ color:"var(--gold)" }}>Find Nearby</strong> to discover CA members near you.
+                                <strong style={{ color: "var(--gold)" }}>Find Nearby</strong> to discover CA members near you.
                             </div>
                         </div>
                     )}

@@ -26,6 +26,11 @@ spring:
               predicates:
                 - Path=/api/locations/**
 
+            - id: messaging-service
+              uri: lb://MESSAGING-SERVICE
+              predicates:
+                - Path=/api/messages/**
+
 
 
 

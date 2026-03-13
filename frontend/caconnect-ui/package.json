@@ -15,6 +15,7 @@
     "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.9",
     "@reduxjs/toolkit": "^2.11.2",
+    "@stomp/stompjs": "^7.3.0",
     "axios": "^1.13.6",
     "framer-motion": "^12.35.1",
     "react": "^19.2.4",
@@ -22,7 +23,9 @@
     "react-oauth2-code-pkce": "^1.24.0",
     "react-redux": "^9.2.0",
     "react-router": "^7.13.1",
-    "react-router-dom": "^7.13.1"
+    "react-router-dom": "^7.13.1",
+    "sockjs-client": "^1.6.1",
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

@@ -4,9 +4,9 @@ spring:
 
 # db connection
   datasource:
-    url: jdbc:postgresql://db.gygppngeyoyqcbvkkmlp.supabase.co:5432/postgres
+    url: ${SUPERBASE_DB_URL}
     username: postgres
-    password: ${DB_PASSWORD}
+    password: ${SUPERBASE_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update

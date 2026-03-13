@@ -10,6 +10,7 @@ import Community from "./components/pages/Community";
 import CreateProfileForm from "./components/pages/CreateprofileForm";
 import UserProfileRouter from "./components/pages/UserProfileRouter";
 import NearestUsersPage from "./components/pages/NearestUserPage";
+import ChatPage from "./components/pages/ChatPage";
 
 // ─── OAuth2 / PKCE Config ─────────────────────────────────────────────────────
 // Replace these values with your actual OAuth provider details
@@ -67,13 +68,19 @@ function App() {
                 <UserProfileRouter />
               }
             />
-            
+
             {/* - view user */}
             <Route
               path="/nearby"
               element={
                 <NearestUsersPage />
               }
+            />
+
+            {/* - view user */}
+            <Route
+              path="/chat/:userId"
+              element={<ChatPage />}
             />
           </Routes>
         </Router>
