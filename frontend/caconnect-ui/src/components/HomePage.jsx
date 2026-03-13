@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredential, logout } from "./../store/authSlice";
-
+import { Link } from "react-router-dom";
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
 fontLink.rel = "stylesheet";
@@ -405,7 +405,7 @@ export default function HomePage() {
 
     // ── Auth (OAuth2 PKCE + Redux) ──────────────────────────────────────────────
     // Destructure idToken from AuthContext (alongside token)
-    const { token, tokenData, idToken, logIn,userId, logOut, error: authError } = useContext(AuthContext);
+    const { token, tokenData, idToken, logIn, userId, logOut, error: authError } = useContext(AuthContext);
     const dispatch = useDispatch();
 
     // Sync OAuth token → Redux store whenever token/tokenData changes
@@ -475,7 +475,14 @@ export default function HomePage() {
 
         window.location.href = registerUrl;
     };
-
+    /*navigation links */
+    const navLinks = [
+        { name: "Study Resources", path: "/study-materials" },
+        { name: "Community", path: "/community" },
+        { name: "Mentorship", path: "/mentorship" },
+        { name: "Nearest Users", path: "/nearby" },
+        { name: "View User", path: "/view-user" }
+    ];
     return (
         <>
             <style>{css}</style>
@@ -488,9 +495,13 @@ export default function HomePage() {
                         Connect<span className="dot">.</span>
                     </a>
 
+
+
                     <ul className="nav-links">
-                        {["Study Resources", "Community", "Mentorship", "Articles", "Exam Info"].map((l) => (
-                            <li key={l}><a href="#">{l}</a></li>
+                        {navLinks.map((link) => (
+                            <li key={link.name}>
+                                <Link to={link.path}>{link.name}</Link>
+                            </li>
                         ))}
                     </ul>
 
