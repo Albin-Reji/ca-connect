@@ -4,7 +4,7 @@ spring:
 
 #  db connection
   datasource:
-    url: jdbc:postgresql://localhost:5432/ca_connect_db
+    url: jdbc:postgresql://db.gygppngeyoyqcbvkkmlp.supabase.co:5432/postgres
     username: postgres
     password: ${DB_PASSWORD}
     
