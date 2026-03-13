@@ -9,9 +9,12 @@ import java.util.List;
 
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, String> {
-    ;
 
-    UserProfile findByUserId(String userId);
+
 
     List<UserProfile> findAllByExamStage(ExamStage examStage);
+
+    UserProfile findByKeyCloakId(String keyCloakId);
+
+    Boolean existsByKeyCloakId(String keyCloakId);
 }

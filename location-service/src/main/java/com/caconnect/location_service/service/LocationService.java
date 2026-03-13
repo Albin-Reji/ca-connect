@@ -27,7 +27,7 @@ public class LocationService {
         this.userServiceWebClient = userServiceWebClient;
     }
     public Mono<Location> saveLocationToDB(LocationRequest locationRequest) {
-        return isUserExist(locationRequest.getUserId())
+        return isUserExist(locationRequest.getKeyCloakId())
                 .defaultIfEmpty(false)
                 .onErrorReturn(false) // ← handles 404/500 from user-service too
                 .flatMap(exists -> {
@@ -35,7 +35,7 @@ public class LocationService {
                         return Mono.error(new UserNotFoundException("UserId is Invalid"));
                     }
                     Location location = Location.builder()
-                            .userId(locationRequest.getUserId())
+                            .keyCloakId(locationRequest.getKeyCloakId())
                             .latitude(locationRequest.getLatitude())
                             .longitude(locationRequest.getLongitude())
                             .build();
@@ -45,8 +45,8 @@ public class LocationService {
                 });
     }
 
-    public Mono<Location> getLocationByUserId(String userId) {
-        return Mono.fromCallable(() -> locationRepository.getByUserId(userId))
+    public Mono<Location> getLocationByUserId(String keyCloakId) {
+        return Mono.fromCallable(() -> locationRepository.getByKeyCloakId(keyCloakId))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -65,9 +65,9 @@ public class LocationService {
     /* checking whether user exist for this fucntion()
         saveLocationToDB(LocationRequest locationRequest)
     * */
-    public Mono<Boolean> isUserExist(String userId){
+    public Mono<Boolean> isUserExist(String keyCloakId){
         return userServiceWebClient.get()
-                .uri("/api/users/userId/{userId}", userId)
+                .uri("/api/users/userId/{keyCloakId}", keyCloakId)
                 .retrieve()
                 .bodyToMono(Boolean.class);
     }
@@ -77,7 +77,7 @@ public class LocationService {
                 request.getLatitude(),
                 request.getLongitude(),
                 request.getLimit(),
-                request.getUserIds()
+                request.getKeyCloakIds()
         );
     }
 }
