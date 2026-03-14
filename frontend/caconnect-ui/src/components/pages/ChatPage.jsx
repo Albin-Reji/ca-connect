@@ -352,219 +352,219 @@ const css = `
 const AVATAR_COLORS = ["#c9a84c", "#4ea8de", "#63e6be", "#a78bfa", "#f472b6", "#f77f00", "#34d399"];
 
 function getInitials(name = "") {
-    return name.split(" ").slice(0, 2).map(n => n[0]?.toUpperCase()).join("") || "?";
+  return name.split(" ").slice(0, 2).map(n => n[0]?.toUpperCase()).join("") || "?";
 }
 
 function avatarColor(id = "") {
-    return AVATAR_COLORS[id.charCodeAt(0) % AVATAR_COLORS.length];
+  return AVATAR_COLORS[id.charCodeAt(0) % AVATAR_COLORS.length];
 }
 
 function formatTime(dateStr) {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
 function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) return 'Today';
-    if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (date.toDateString() === today.toDateString()) return 'Today';
+  if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 export default function ChatPage() {
-    const { token, tokenData } = useContext(AuthContext);
-    const navigate = useNavigate();
-    const { userId: otherUserId } = useParams();
+  const { token, tokenData } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { userId: otherUserId } = useParams();
 
-    const [messages, setMessages] = useState([]);
-    const [inputText, setInputText] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [otherUserProfile, setOtherUserProfile] = useState(null);
-    const messagesEndRef = useRef(null);
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [otherUserProfile, setOtherUserProfile] = useState(null);
+  const messagesEndRef = useRef(null);
 
-    const myUserId = tokenData?.sub;
+  const myUserId = tokenData?.sub;
 
-    // Handle incoming WebSocket messages
-    const handleIncomingMessage = useCallback((msg) => {
-        // Only add if it's part of this conversation
-        if (msg.senderId === otherUserId || msg.receiverId === otherUserId) {
-            setMessages(prev => {
-                // Avoid duplicates
-                if (prev.some(m => m.id === msg.id)) return prev;
-                return [...prev, msg].sort((a, b) =>
-                    new Date(a.sentAt) - new Date(b.sentAt)
-                );
-            });
-        }
-    }, [otherUserId]);
+  // Handle incoming WebSocket messages
+  const handleIncomingMessage = useCallback((msg) => {
+    // Only add if it's part of this conversation
+    if (msg.senderId === otherUserId || msg.receiverId === otherUserId) {
+      setMessages(prev => {
+        // Avoid duplicates
+        if (prev.some(m => m.id === msg.id)) return prev;
+        return [...prev, msg].sort((a, b) =>
+          new Date(a.sentAt) - new Date(b.sentAt)
+        );
+      });
+    }
+  }, [otherUserId]);
 
-    const { connected, sendMessage: sendWsMessage } = useWebSocket(token, myUserId, handleIncomingMessage);
+  const { connected, sendMessage: sendWsMessage } = useWebSocket(token, myUserId, handleIncomingMessage);
 
-    // Scroll to bottom when messages change
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-    // Load other user's profile
-    useEffect(() => {
-        if (!otherUserId || !token) return;
+  // Load other user's profile
+  useEffect(() => {
+    if (!otherUserId || !token) return;
 
-        fetch(`http://localhost:8080/api/profiles/users/${otherUserId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then(res => res.ok ? res.json() : null)
-            .then(data => setOtherUserProfile(data))
-            .catch(err => console.error('Failed to load profile:', err));
-    }, [otherUserId, token]);
+    fetch(`http://localhost:8080/api/profiles/users/${otherUserId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setOtherUserProfile(data))
+      .catch(err => console.error('Failed to load profile:', err));
+  }, [otherUserId, token]);
 
-    // Load conversation history
-    useEffect(() => {
-        if (!myUserId || !otherUserId || !token) return;
+  // Load conversation history
+  useEffect(() => {
+    if (!myUserId || !otherUserId || !token) return;
 
-        setLoading(true);
-        fetch(`http://localhost:8080/api/messages/conversation/${otherUserId}?page=0&size=100`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'X-USER-ID': myUserId
-            }
-        })
-            .then(res => res.ok ? res.json() : [])
-            .then(data => {
-                // Reverse to show oldest first
-                setMessages(data.reverse());
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error('Failed to load messages:', err);
-                setLoading(false);
-            });
-    }, [myUserId, otherUserId, token]);
+    setLoading(true);
+    fetch(`http://localhost:8080/api/messages/conversation/${otherUserId}?page=0&size=100`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'X-USER-ID': myUserId
+      }
+    })
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        // Reverse to show oldest first
+        setMessages(data.reverse());
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load messages:', err);
+        setLoading(false);
+      });
+  }, [myUserId, otherUserId, token]);
 
-    const handleSend = () => {
-        if (!inputText.trim() || !connected) return;
+  const handleSend = () => {
+    if (!inputText.trim() || !connected) return;
 
-        const success = sendWsMessage(otherUserId, inputText.trim());
-        if (success) {
-            setInputText('');
-        }
-    };
+    const success = sendWsMessage(otherUserId, inputText.trim());
+    if (success) {
+      setInputText('');
+    }
+  };
 
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-        }
-    };
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
-    const otherUserColor = avatarColor(otherUserId || '');
-    const myColor = avatarColor(myUserId || '');
-    const otherUserInitials = getInitials(otherUserProfile?.fullName);
-    const myInitials = getInitials(tokenData?.name || tokenData?.preferred_username);
+  const otherUserColor = avatarColor(otherUserId || '');
+  const myColor = avatarColor(myUserId || '');
+  const otherUserInitials = getInitials(otherUserProfile?.fullName);
+  const myInitials = getInitials(tokenData?.name || tokenData?.preferred_username);
 
-    // Group messages by date
-    const messagesByDate = messages.reduce((acc, msg) => {
-        const date = formatDate(msg.sentAt);
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(msg);
-        return acc;
-    }, {});
+  // Group messages by date
+  const messagesByDate = messages.reduce((acc, msg) => {
+    const date = formatDate(msg.sentAt);
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(msg);
+    return acc;
+  }, {});
 
-    return (
-        <>
-            <style>{css}</style>
-            <div className="chat-page">
-                <div className="chat-header">
-                    <div className="header-left">
-                        <button className="back-btn" onClick={() => navigate(-1)}>
-                            ←
-                        </button>
-                        <div className="user-avatar" style={{ background: `${otherUserColor}22` }}>
-                            <span style={{ color: otherUserColor }}>{otherUserInitials}</span>
-                        </div>
-                        <div className="user-info">
-                            <div className="user-name">
-                                {otherUserProfile?.fullName || 'Loading...'}
-                            </div>
-                            <div className="user-status">
-                                <div className="status-dot" />
-                                Online
-                            </div>
-                        </div>
-                    </div>
-                    <div className={`connection-badge ${connected ? '' : 'disconnected'}`}>
-                        {connected ? '🟢 Connected' : '🔴 Disconnected'}
-                    </div>
-                </div>
-
-                <div className="chat-messages">
-                    {loading ? (
-                        <div className="loading-messages">
-                            <div className="spinner" />
-                        </div>
-                    ) : messages.length === 0 ? (
-                        <div className="empty-state">
-                            <div className="empty-icon">💬</div>
-                            <div className="empty-text">No messages yet. Start the conversation!</div>
-                        </div>
-                    ) : (
-                        Object.entries(messagesByDate).map(([date, msgs]) => (
-                            <div key={date}>
-                                <div className="date-divider">
-                                    <div className="date-text">{date}</div>
-                                </div>
-                                {msgs.map((msg) => {
-                                    const isSent = msg.senderId === myUserId;
-                                    const color = isSent ? myColor : otherUserColor;
-                                    const initials = isSent ? myInitials : otherUserInitials;
-
-                                    return (
-                                        <div key={msg.id} className={`message-group ${isSent ? 'sent' : 'received'}`}>
-                                            <div className="message-avatar" style={{ background: `${color}22` }}>
-                                                <span style={{ color }}>{initials}</span>
-                                            </div>
-                                            <div className="message-content">
-                                                <div className="message-bubble">
-                                                    {msg.content}
-                                                </div>
-                                                <div className="message-time">
-                                                    {formatTime(msg.sentAt)}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ))
-                    )}
-                    <div ref={messagesEndRef} />
-                </div>
-
-                <div className="chat-input-area">
-                    <div className="input-wrapper">
-                        <textarea
-                            className="message-input"
-                            placeholder="Type a message..."
-                            value={inputText}
-                            onChange={(e) => setInputText(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            rows={1}
-                        />
-                        <button
-                            className="send-btn"
-                            onClick={handleSend}
-                            disabled={!inputText.trim() || !connected}
-                        >
-                            ➤
-                        </button>
-                    </div>
-                </div>
+  return (
+    <>
+      <style>{css}</style>
+      <div className="chat-page">
+        <div className="chat-header">
+          <div className="header-left">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+              ←
+            </button>
+            <div className="user-avatar" style={{ background: `${otherUserColor}22` }}>
+              <span style={{ color: otherUserColor }}>{otherUserInitials}</span>
             </div>
-        </>
-    );
+            <div className="user-info">
+              <div className="user-name">
+                {otherUserProfile?.fullName || 'Loading...'}
+              </div>
+              <div className="user-status">
+                <div className="status-dot" />
+                Online
+              </div>
+            </div>
+          </div>
+          <div className={`connection-badge ${connected ? '' : 'disconnected'}`}>
+            {connected ? '🟢 Connected' : '🔴 Disconnected'}
+          </div>
+        </div>
+
+        <div className="chat-messages">
+          {loading ? (
+            <div className="loading-messages">
+              <div className="spinner" />
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">💬</div>
+              <div className="empty-text">No messages yet. Start the conversation!</div>
+            </div>
+          ) : (
+            Object.entries(messagesByDate).map(([date, msgs]) => (
+              <div key={date}>
+                <div className="date-divider">
+                  <div className="date-text">{date}</div>
+                </div>
+                {msgs.map((msg) => {
+                  const isSent = msg.senderId === myUserId;
+                  const color = isSent ? myColor : otherUserColor;
+                  const initials = isSent ? myInitials : otherUserInitials;
+
+                  return (
+                    <div key={msg.id} className={`message-group ${isSent ? 'sent' : 'received'}`}>
+                      <div className="message-avatar" style={{ background: `${color}22` }}>
+                        <span style={{ color }}>{initials}</span>
+                      </div>
+                      <div className="message-content">
+                        <div className="message-bubble">
+                          {msg.content}
+                        </div>
+                        <div className="message-time">
+                          {formatTime(msg.sentAt)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="chat-input-area">
+          <div className="input-wrapper">
+            <textarea
+              className="message-input"
+              placeholder="Type a message..."
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={handleKeyPress}
+              rows={1}
+            />
+            <button
+              className="send-btn"
+              onClick={handleSend}
+              disabled={!inputText.trim() || !connected}
+            >
+              ➤
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
