@@ -1,6 +1,5 @@
 package com.caconnect.messaging_service.service;
 
-
 import com.caconnect.messaging_service.dto.MessageResponse;
 import com.caconnect.messaging_service.dto.SendMessageRequest;
 import com.caconnect.messaging_service.model.Message;
@@ -50,22 +49,31 @@ public class MessageService {
         Message saved = messageRepository.save(message);
         MessageResponse response = toResponse(saved);
 
-        // Push message to receiver's WebSocket topic in real time
-        // Receiver subscribes to /user/{receiverId}/queue/messages
-        messagingTemplate.convertAndSendToUser(
-                request.getReceiverId(),
-                "/queue/messages",
+        // ─────────────────────────────────────────────────────────────
+        // Push to TOPIC-based destinations instead of user-destinations.
+        //
+        // WHY: convertAndSendToUser() requires a Principal on WebSocket
+        // sessions, which is complex to set up with SockJS + Keycloak.
+        // Topic-based messaging (convertAndSend to /topic/messages/{userId})
+        // works without any Principal and is simpler to reason about.
+        //
+        // Each client subscribes to /topic/messages/{theirUserId} and
+        // receives all messages addressed TO them.
+        // ─────────────────────────────────────────────────────────────
+
+        // Push to receiver's personal topic
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + request.getReceiverId(),
                 response
         );
 
-        // Also push back to sender so their UI updates instantly
-        messagingTemplate.convertAndSendToUser(
-                senderId,
-                "/queue/messages",
+        // Push to sender's personal topic (echo — so sender UI updates too)
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + senderId,
                 response
         );
 
-        log.info("Message sent from {} to {} in conversation {}",
+        log.info("Message saved & broadcast — from {} to {} in conversation {}",
                 senderId, request.getReceiverId(), conversationId);
 
         return response;

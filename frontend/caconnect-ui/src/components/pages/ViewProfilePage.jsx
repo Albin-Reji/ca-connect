@@ -465,7 +465,7 @@ export default function ViewProfilePage() {
                                             <span className="badge badge-purple">Age {profile.age}</span>
                                         </div>
                                         <div className="hero-actions">
-                                            <button className="btn-gold">✉️ Message</button>
+                                            <button className="btn-gold" onClick={() => navigate(`/chat/${profile.keyCloakId}`)}>✉️ Message</button>
                                             <button className="btn-outline">🔗 Share Profile</button>
                                         </div>
                                     </div>
