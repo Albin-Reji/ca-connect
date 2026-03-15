@@ -95,4 +95,27 @@ public class UserController {
     public ResponseEntity<Boolean> isUserExistByUserId(@PathVariable("keyCloakId") String keyCloakId){
         return ResponseEntity.ok(userService.isUserExistBykeyCloakId(keyCloakId));
     }
+
+    /**
+     * Syncs a Keycloak-authenticated user to the local database.
+     *
+     * <p>Called by the frontend after successful OAuth2/PKCE authentication.
+     * Idempotent — safe to call multiple times; creates a new user only if
+     * one does not already exist for the given Keycloak ID.</p>
+     *
+     * @param request contains keyCloakId, email, firstName, lastName from JWT
+     * @return ApiResponse containing synced or existing user details
+     */
+    @PostMapping("/sync")
+    public ResponseEntity<ApiResponse<UserResponse>> syncKeycloakUser(
+            @RequestBody RegisterRequest request) {
+
+        log.info("Syncing Keycloak user with keyCloakId: {}, email: {}",
+                request.getKeyCloakId(), request.getEmail());
+
+        return ApiResponses.ok(
+                userService.syncKeycloakUser(request),
+                "User synced successfully"
+        );
+    }
 }

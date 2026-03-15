@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredential, logout } from "./../store/authSlice";
@@ -9,6 +9,7 @@ fontLink.rel = "stylesheet";
 fontLink.href =
     "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap";
 document.head.appendChild(fontLink);
+
 
 // ─── CSS ──────────────────────────────────────────────────────────────────────
 const css = `
@@ -407,13 +408,41 @@ export default function HomePage() {
     // Destructure idToken from AuthContext (alongside token)
     const { token, tokenData, idToken, logIn, userId, logOut, error: authError } = useContext(AuthContext);
     const dispatch = useDispatch();
+    const hasSynced = useRef(false); // prevent duplicate sync calls
 
-    // Sync OAuth token → Redux store whenever token/tokenData changes
+    // Sync OAuth token → Redux store AND sync user to local DB
     useEffect(() => {
         if (token && tokenData) {
             dispatch(setCredential({ token, user: tokenData }));
-            // console.log("User Data: " + tokenData + " \n" + "token: " + token + " \n" + "userId: " +JSON.parse( localStorage.getItem("user")).name);
 
+            // Auto-sync user to local DB (idempotent — safe to call multiple times)
+            if (!hasSynced.current) {
+                hasSynced.current = true;
+
+                const syncPayload = {
+                    keyCloakId: tokenData.sub,
+                    email: tokenData.email,
+                    firstName: tokenData.given_name || tokenData.name || "",
+                    lastName: tokenData.family_name || "",
+                };
+
+                fetch("http://localhost:8080/api/users/sync", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(syncPayload),
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        console.log("✅ User synced to DB:", data);
+                    })
+                    .catch((err) => {
+                        console.error("❌ Failed to sync user to DB:", err);
+                        hasSynced.current = false; // allow retry on next render
+                    });
+            }
         }
     }, [token, tokenData, dispatch]);
 

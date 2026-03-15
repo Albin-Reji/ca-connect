@@ -29,8 +29,6 @@ public class RegisterRequest {
     @Email(message = "Invalid Email Format")
     private  String email;
 
-    @NotBlank(message = "Password is Required")
-    @Size(min = 6, message = "Password must have at least 6 character")
     private  String password;
 
     private String keyCloakId;
