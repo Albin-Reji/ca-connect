@@ -16,7 +16,7 @@ public class WebClientConfig {
     @Bean(name = "locationWebClient")
     public WebClient locationWebClient(){
         return WebClient.builder()
-                .baseUrl("http://localhost:8082")
+                .baseUrl("http://gateway:8080")
                 .build();
     }
 }
