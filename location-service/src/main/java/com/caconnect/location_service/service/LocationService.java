@@ -26,8 +26,8 @@ public class LocationService {
         this.locationRepository = locationRepository;
         this.userServiceWebClient = userServiceWebClient;
     }
-    public Mono<Location> saveLocationToDB(LocationRequest locationRequest) {
-        return isUserExist(locationRequest.getKeyCloakId())
+    public Mono<Location> saveLocationToDB(LocationRequest locationRequest, String token) {
+        return isUserExist(locationRequest.getKeyCloakId(), token)
                 .defaultIfEmpty(false)
                 .onErrorReturn(false) // ← handles 404/500 from user-service too
                 .flatMap(exists -> {
@@ -65,9 +65,10 @@ public class LocationService {
     /* checking whether user exist for this fucntion()
         saveLocationToDB(LocationRequest locationRequest)
     * */
-    public Mono<Boolean> isUserExist(String keyCloakId){
+    public Mono<Boolean> isUserExist(String keyCloakId, String token){
         return userServiceWebClient.get()
                 .uri("/api/users/userId/{keyCloakId}", keyCloakId)
+                .header("Authorization", token)
                 .retrieve()
                 .bodyToMono(Boolean.class);
     }

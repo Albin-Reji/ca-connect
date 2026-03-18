@@ -267,7 +267,8 @@ export default function MessageTest() {
         setData(null);
         setIsError(false);
         try {
-            const res = await fetch("http://localhost:8080/api/messages/", {
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            const res = await fetch(`${apiUrl}/messages/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -320,7 +321,7 @@ export default function MessageTest() {
                             {/* ── Endpoint ── */}
                             <div className="mt-endpoint">
                                 <span className="mt-method">GET</span>
-                                <span className="mt-url">http://localhost:8080/api/messages/</span>
+                                <span className="mt-url">{import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/messages/</span>
                             </div>
 
                             {/* ── User ID ── */}

@@ -40,7 +40,8 @@ export default function UserProfileRouter() {
   useEffect(() => {
     if (!keyCloakId || !token) return;
 
-    fetch(`http://localhost:8080/api/profiles/users/${keyCloakId}/exist`, {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    fetch(`${apiUrl}/profiles/users/${keyCloakId}/exist`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {

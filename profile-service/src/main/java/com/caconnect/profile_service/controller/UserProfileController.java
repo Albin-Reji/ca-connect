@@ -21,9 +21,9 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     @PostMapping("/")
-    public Mono<UserProfile> saveUserProfile(@RequestBody UserProfileRequest request){
+    public Mono<UserProfile> saveUserProfile(@RequestHeader("Authorization") String token, @RequestBody UserProfileRequest request){
         log.info("frontend request: \n"+ request.toString());
-        return userProfileService.saveUserProfile(request);
+        return userProfileService.saveUserProfile(request, token);
     }
 
     @GetMapping("/users/{keyCloakId}")
@@ -33,12 +33,13 @@ public class UserProfileController {
 
     @GetMapping("/users/{keyCloakId}/nearest/{limit}")
     public Mono<ResponseEntity<List<Location>>> getNearestUsersOfSameExamStage(
+            @RequestHeader("Authorization") String token,
             @PathVariable("keyCloakId") String keyCloakId,
             @PathVariable("limit") Integer limit,
             @RequestParam(value = "examStage", required = false) String examStage) {
 
         log.info("Searching nearby User: {} limit: {} examStage: {}", keyCloakId, limit, examStage);
-        return userProfileService.getNearestUsersOfSameExamStage(keyCloakId, limit, examStage)
+        return userProfileService.getNearestUsersOfSameExamStage(keyCloakId, limit, examStage, token)
                 .map(ResponseEntity::ok);
     }
 

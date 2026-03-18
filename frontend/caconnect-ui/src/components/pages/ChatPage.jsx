@@ -368,10 +368,10 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  // ── Load other user's profile ──────────────────────────────────────
   useEffect(() => {
     if (!otherUserId || !token) return;
-    fetch(`http://localhost:8080/api/profiles/users/${otherUserId}`, {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    fetch(`${apiUrl}/profiles/users/${otherUserId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))
@@ -395,8 +395,9 @@ export default function ChatPage() {
       else setLoadingOlder(true);
 
       try {
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
         const res = await fetch(
-          `http://localhost:8080/api/messages/conversation/${otherUserId}?page=${page}&size=${PAGE_SIZE}`,
+          `${apiUrl}/messages/conversation/${otherUserId}?page=${page}&size=${PAGE_SIZE}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

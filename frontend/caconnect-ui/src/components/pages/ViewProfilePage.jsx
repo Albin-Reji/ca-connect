@@ -353,227 +353,228 @@ const css = `
   }
 `;
 
-const STAGES      = ["FOUNDATION", "INTERMEDIATE", "ARTICLESHIP", "FINAL", "QUALIFIED"];
+const STAGES = ["FOUNDATION", "INTERMEDIATE", "ARTICLESHIP", "FINAL", "QUALIFIED"];
 const STAGE_LABELS = { FOUNDATION: "Foundation", INTERMEDIATE: "Inter", ARTICLESHIP: "Articles", FINAL: "Final", QUALIFIED: "Qualified" };
-const STAGE_ICONS  = { FOUNDATION: "📗", INTERMEDIATE: "📘", ARTICLESHIP: "💼", FINAL: "🏆", QUALIFIED: "⭐" };
+const STAGE_ICONS = { FOUNDATION: "📗", INTERMEDIATE: "📘", ARTICLESHIP: "💼", FINAL: "🏆", QUALIFIED: "⭐" };
 
 function stageIndex(stage) { return STAGES.indexOf(stage); }
 function getInitials(name = "") {
-    return name.split(" ").slice(0, 2).map(n => n[0]?.toUpperCase()).join("") || "?";
+  return name.split(" ").slice(0, 2).map(n => n[0]?.toUpperCase()).join("") || "?";
 }
 
 export default function ViewProfilePage() {
-    const { token, tokenData } = useContext(AuthContext);
-    const navigate = useNavigate();
+  const { token, tokenData } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError]     = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    const keyCloakId = tokenData?.sub;
+  const keyCloakId = tokenData?.sub;
 
-    useEffect(() => {
-        if (!keyCloakId || !token) return;
-        setLoading(true);
-        fetch(`http://localhost:8080/api/profiles/users/${keyCloakId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
-                return res.json();
-            })
-            .then(data  => { setProfile(data);        setLoading(false); })
-            .catch(err  => { setError(err.message);   setLoading(false); });
-    }, [keyCloakId, token]);
+  useEffect(() => {
+    if (!keyCloakId || !token) return;
+    setLoading(true);
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    fetch(`${apiUrl}/profiles/users/${keyCloakId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+        return res.json();
+      })
+      .then(data => { setProfile(data); setLoading(false); })
+      .catch(err => { setError(err.message); setLoading(false); });
+  }, [keyCloakId, token]);
 
-    const initials       = getInitials(profile?.fullName);
-    const currentStageIdx = stageIndex(profile?.examStage);
-    const addr           = profile?.address;
+  const initials = getInitials(profile?.fullName);
+  const currentStageIdx = stageIndex(profile?.examStage);
+  const addr = profile?.address;
 
-    return (
-        <>
-            <style>{css}</style>
-            <div className="profile-page">
-                <div className="profile-container">
+  return (
+    <>
+      <style>{css}</style>
+      <div className="profile-page">
+        <div className="profile-container">
 
-                    {/* ── Top Bar: Back button + Breadcrumb ── */}
-                    <div className="profile-topbar">
-                        <button className="back-btn" onClick={() => navigate(-1)}>
-                            <span className="back-btn-arrow">←</span>
-                            <span className="back-btn-label">Back</span>
-                        </button>
+          {/* ── Top Bar: Back button + Breadcrumb ── */}
+          <div className="profile-topbar">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+              <span className="back-btn-arrow">←</span>
+              <span className="back-btn-label">Back</span>
+            </button>
 
-                        <nav className="breadcrumb">
-                            <span>Home</span>
-                            <span className="breadcrumb-sep">›</span>
-                            <span>Dashboard</span>
-                            <span className="breadcrumb-sep">›</span>
-                            <span className="breadcrumb-current">My Profile</span>
-                        </nav>
-                    </div>
+            <nav className="breadcrumb">
+              <span>Home</span>
+              <span className="breadcrumb-sep">›</span>
+              <span>Dashboard</span>
+              <span className="breadcrumb-sep">›</span>
+              <span className="breadcrumb-current">My Profile</span>
+            </nav>
+          </div>
 
-                    {/* ── Loading ── */}
-                    {loading && (
-                        <div className="center-state">
-                            <div className="spinner" />
-                            <p style={{ color: "var(--muted)", fontSize: 14 }}>Fetching your profile…</p>
-                        </div>
-                    )}
-
-                    {/* ── Error ── */}
-                    {error && !loading && (
-                        <div className="center-state">
-                            <div className="error-box">
-                                <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
-                                <div style={{ fontSize: 16, fontWeight: 700, color: "var(--white)", marginBottom: 8 }}>
-                                    Could not load profile
-                                </div>
-                                <div style={{ fontSize: 13, color: "var(--muted)" }}>{error}</div>
-                                <button
-                                    className="back-btn"
-                                    style={{ marginTop: 20 }}
-                                    onClick={() => navigate(-1)}
-                                >
-                                    <span className="back-btn-arrow">←</span>
-                                    <span className="back-btn-label">Go Back</span>
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* ── Profile ── */}
-                    {profile && !loading && (
-                        <>
-                            {/* Hero Card */}
-                            <div className="hero-card fade-up d1">
-                                <div className="hero-card-inner">
-                                    <div className="profile-avatar-wrap">
-                                        <div className="profile-avatar">{initials}</div>
-                                        <div className="avatar-ring" />
-                                    </div>
-                                    <div className="hero-info">
-                                        <h1 className="hero-name">
-                                            <span className="gold-text">{profile.fullName}</span>
-                                        </h1>
-                                        <p className="hero-email">{profile.email}</p>
-                                        <div className="hero-badges">
-                                            <span className="badge badge-gold">
-                                                {STAGE_ICONS[profile.examStage]} {STAGE_LABELS[profile.examStage] || profile.examStage}
-                                            </span>
-                                            <span className="badge badge-green">✓ Verified</span>
-                                            {addr?.city && <span className="badge badge-blue">📍 {addr.city}</span>}
-                                            <span className="badge badge-purple">Age {profile.age}</span>
-                                        </div>
-                                        <div className="hero-actions">
-                                            <button className="btn-gold" onClick={() => navigate(`/chat/${profile.keyCloakId}`)}>✉️ Message</button>
-                                            <button className="btn-outline">🔗 Share Profile</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="stat-strip">
-                                    {[
-                                        { num: profile.age,                                           label: "Years Old",   color: "var(--gold)" },
-                                        { num: STAGE_LABELS[profile.examStage] || profile.examStage,  label: "Exam Stage",  color: "#63e6be"     },
-                                        { num: addr?.country || "—",                                  label: "Country",     color: "#4ea8de"     },
-                                    ].map((s, i) => (
-                                        <div key={i} className="stat-strip-item">
-                                            <div className="stat-strip-num" style={{ color: s.color }}>{s.num}</div>
-                                            <div className="stat-strip-label">{s.label}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Info Grid */}
-                            <div className="info-grid">
-
-                                {/* CA Journey */}
-                                <div className="info-card full fade-up d2">
-                                    <div className="card-label">🎯 CA Journey Progress</div>
-                                    <div className="stage-track">
-                                        {STAGES.map((s, i) => {
-                                            const done   = i < currentStageIdx;
-                                            const active = i === currentStageIdx;
-                                            return (
-                                                <div key={s} className={`stage-node ${done ? "done" : ""}`}>
-                                                    <div className={`stage-dot ${done ? "done" : active ? "active" : ""}`}>
-                                                        {done ? "✓" : STAGE_ICONS[s]}
-                                                    </div>
-                                                    <span className={`stage-name ${active ? "active" : ""}`}>
-                                                        {STAGE_LABELS[s]}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                {/* Contact */}
-                                <div className="info-card fade-up d3">
-                                    <div className="card-label">📞 Contact</div>
-                                    <div className="contact-item">
-                                        <div className="contact-icon" style={{ background: "rgba(201,168,76,0.1)" }}>✉️</div>
-                                        <div>
-                                            <div className="contact-label">Email</div>
-                                            <div className="contact-value">{profile.email}</div>
-                                        </div>
-                                    </div>
-                                    <div className="contact-item">
-                                        <div className="contact-icon" style={{ background: "rgba(99,230,190,0.1)" }}>📱</div>
-                                        <div>
-                                            <div className="contact-label">Phone</div>
-                                            <div className="contact-value">{profile.phoneNumber}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Location */}
-                                <div className="info-card fade-up d3">
-                                    <div className="card-label">📍 Location</div>
-                                    {addr ? (
-                                        <div className="location-card">
-                                            <div className="location-icon">🏙️</div>
-                                            <div>
-                                                <div className="location-city">{addr.city || "—"}</div>
-                                                <div className="location-detail">
-                                                    {[addr.state, addr.country].filter(Boolean).join(", ")}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <p style={{ color: "var(--muted)", fontSize: 14 }}>No address on file.</p>
-                                    )}
-                                    {addr?.streetAddress && (
-                                        <div className="field-row" style={{ marginTop: 12 }}>
-                                            <span className="field-key">Street</span>
-                                            <span className="field-val">{addr.streetAddress}</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Personal Details */}
-                                <div className="info-card full fade-up d4">
-                                    <div className="card-label">👤 Personal Details</div>
-                                    {[
-                                        { key: "Full Name",   val: profile.fullName },
-                                        { key: "Age",         val: `${profile.age} years` },
-                                        { key: "Exam Stage",  val: STAGE_LABELS[profile.examStage] || profile.examStage },
-                                        { key: "Keycloak ID", val: profile.keyCloakId || "—" },
-                                    ].map(({ key, val }) => (
-                                        <div key={key} className="field-row">
-                                            <span className="field-key">{key}</span>
-                                            <span className="field-val">{val}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                            </div>
-                        </>
-                    )}
-
-                </div>
+          {/* ── Loading ── */}
+          {loading && (
+            <div className="center-state">
+              <div className="spinner" />
+              <p style={{ color: "var(--muted)", fontSize: 14 }}>Fetching your profile…</p>
             </div>
-        </>
-    );
+          )}
+
+          {/* ── Error ── */}
+          {error && !loading && (
+            <div className="center-state">
+              <div className="error-box">
+                <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "var(--white)", marginBottom: 8 }}>
+                  Could not load profile
+                </div>
+                <div style={{ fontSize: 13, color: "var(--muted)" }}>{error}</div>
+                <button
+                  className="back-btn"
+                  style={{ marginTop: 20 }}
+                  onClick={() => navigate(-1)}
+                >
+                  <span className="back-btn-arrow">←</span>
+                  <span className="back-btn-label">Go Back</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Profile ── */}
+          {profile && !loading && (
+            <>
+              {/* Hero Card */}
+              <div className="hero-card fade-up d1">
+                <div className="hero-card-inner">
+                  <div className="profile-avatar-wrap">
+                    <div className="profile-avatar">{initials}</div>
+                    <div className="avatar-ring" />
+                  </div>
+                  <div className="hero-info">
+                    <h1 className="hero-name">
+                      <span className="gold-text">{profile.fullName}</span>
+                    </h1>
+                    <p className="hero-email">{profile.email}</p>
+                    <div className="hero-badges">
+                      <span className="badge badge-gold">
+                        {STAGE_ICONS[profile.examStage]} {STAGE_LABELS[profile.examStage] || profile.examStage}
+                      </span>
+                      <span className="badge badge-green">✓ Verified</span>
+                      {addr?.city && <span className="badge badge-blue">📍 {addr.city}</span>}
+                      <span className="badge badge-purple">Age {profile.age}</span>
+                    </div>
+                    <div className="hero-actions">
+                      <button className="btn-gold" onClick={() => navigate(`/chat/${profile.keyCloakId}`)}>✉️ Message</button>
+                      <button className="btn-outline">🔗 Share Profile</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="stat-strip">
+                  {[
+                    { num: profile.age, label: "Years Old", color: "var(--gold)" },
+                    { num: STAGE_LABELS[profile.examStage] || profile.examStage, label: "Exam Stage", color: "#63e6be" },
+                    { num: addr?.country || "—", label: "Country", color: "#4ea8de" },
+                  ].map((s, i) => (
+                    <div key={i} className="stat-strip-item">
+                      <div className="stat-strip-num" style={{ color: s.color }}>{s.num}</div>
+                      <div className="stat-strip-label">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Info Grid */}
+              <div className="info-grid">
+
+                {/* CA Journey */}
+                <div className="info-card full fade-up d2">
+                  <div className="card-label">🎯 CA Journey Progress</div>
+                  <div className="stage-track">
+                    {STAGES.map((s, i) => {
+                      const done = i < currentStageIdx;
+                      const active = i === currentStageIdx;
+                      return (
+                        <div key={s} className={`stage-node ${done ? "done" : ""}`}>
+                          <div className={`stage-dot ${done ? "done" : active ? "active" : ""}`}>
+                            {done ? "✓" : STAGE_ICONS[s]}
+                          </div>
+                          <span className={`stage-name ${active ? "active" : ""}`}>
+                            {STAGE_LABELS[s]}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Contact */}
+                <div className="info-card fade-up d3">
+                  <div className="card-label">📞 Contact</div>
+                  <div className="contact-item">
+                    <div className="contact-icon" style={{ background: "rgba(201,168,76,0.1)" }}>✉️</div>
+                    <div>
+                      <div className="contact-label">Email</div>
+                      <div className="contact-value">{profile.email}</div>
+                    </div>
+                  </div>
+                  <div className="contact-item">
+                    <div className="contact-icon" style={{ background: "rgba(99,230,190,0.1)" }}>📱</div>
+                    <div>
+                      <div className="contact-label">Phone</div>
+                      <div className="contact-value">{profile.phoneNumber}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="info-card fade-up d3">
+                  <div className="card-label">📍 Location</div>
+                  {addr ? (
+                    <div className="location-card">
+                      <div className="location-icon">🏙️</div>
+                      <div>
+                        <div className="location-city">{addr.city || "—"}</div>
+                        <div className="location-detail">
+                          {[addr.state, addr.country].filter(Boolean).join(", ")}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p style={{ color: "var(--muted)", fontSize: 14 }}>No address on file.</p>
+                  )}
+                  {addr?.streetAddress && (
+                    <div className="field-row" style={{ marginTop: 12 }}>
+                      <span className="field-key">Street</span>
+                      <span className="field-val">{addr.streetAddress}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Personal Details */}
+                <div className="info-card full fade-up d4">
+                  <div className="card-label">👤 Personal Details</div>
+                  {[
+                    { key: "Full Name", val: profile.fullName },
+                    { key: "Age", val: `${profile.age} years` },
+                    { key: "Exam Stage", val: STAGE_LABELS[profile.examStage] || profile.examStage },
+                    { key: "Keycloak ID", val: profile.keyCloakId || "—" },
+                  ].map(({ key, val }) => (
+                    <div key={key} className="field-row">
+                      <span className="field-key">{key}</span>
+                      <span className="field-val">{val}</span>
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+            </>
+          )}
+
+        </div>
+      </div>
+    </>
+  );
 }

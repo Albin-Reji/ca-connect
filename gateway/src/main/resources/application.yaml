@@ -5,9 +5,11 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://keycloak:8080/realms/ca-connect/protocol/openid-connect/certs
+          jwk-set-uri: http://keycloak:8090/realms/ca-connect/protocol/openid-connect/certs
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
       routes:
         - id: user-service
           uri: lb://USER-SERVICE
@@ -28,6 +30,11 @@ spring:
           uri: lb://MESSAGING-SERVICE
           predicates:
             - Path=/api/messages/**
+
+        - id: messaging-service-ws
+          uri: lb://MESSAGING-SERVICE
+          predicates:
+            - Path=/ws/**
 #eureka configuration
 eureka:
   client:
