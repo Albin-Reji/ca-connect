@@ -5,9 +5,9 @@ services:
     image: postgres:15-alpine
     container_name: postgres-db
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-albin}
-      POSTGRES_DB: ${POSTGRES_DB:-ca_connect_db}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -19,12 +19,12 @@ services:
     image: quay.io/keycloak/keycloak:26.5.3
     container_name: keycloak-auth
     environment:
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ca_connect_db}
-      KC_DB_USERNAME: ${POSTGRES_USER:-postgres}
-      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-albin}
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KC_HOSTNAME: localhost
       KC_HOSTNAME_PORT: 8090
       KC_HOSTNAME_STRICT_HTTPS: "false"
@@ -57,8 +57,8 @@ services:
       - "8081:8081"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
-      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ca_connect_db}
-      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD:-albin}
+      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD}
       - KEYCLOAK_URL=http://keycloak:8080
     depends_on:
       - eureka
@@ -76,8 +76,8 @@ services:
       - "8083:8083"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
-      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ca_connect_db}
-      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD:-albin}
+      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD}
       - GEO_CAGE_API_KEY=${GEO_CAGE_API_KEY}
     depends_on:
       - eureka
@@ -95,8 +95,8 @@ services:
       - "8082:8082"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
-      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ca_connect_db}
-      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD:-albin}
+      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD}
       - GEO_CAGE_API_KEY=${GEO_CAGE_API_KEY}
     depends_on:
       - eureka
@@ -114,8 +114,8 @@ services:
       - "8084:8084"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
-      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ca_connect_db}
-      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD:-albin}
+      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - eureka
       - postgres
