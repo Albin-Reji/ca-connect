@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class LocationRequest {
 
-    private String userId;
+    private String keyCloakId;
     private Double latitude;
     private Double longitude;
 }

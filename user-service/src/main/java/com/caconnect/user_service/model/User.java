@@ -61,7 +61,7 @@ public class User {
      * Encrypted user password stored in database.
      * Required for authentication fallback or local login.
      */
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     /**

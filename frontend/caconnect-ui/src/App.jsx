@@ -4,6 +4,13 @@ import { Provider } from "react-redux";
 import { AuthProvider } from "react-oauth2-code-pkce";
 import { store } from "./store/store"; // your Redux store
 import HomePage from "./components/HomePage";
+import StudyMaterials from "./components/pages/StudyMaterials";
+import Mentorship from "./components/pages/Mentorship";
+import Community from "./components/pages/Community";
+import CreateProfileForm from "./components/pages/CreateprofileForm";
+import UserProfileRouter from "./components/pages/UserProfileRouter";
+import NearestUsersPage from "./components/pages/NearestUserPage";
+import ChatPage from "./components/pages/ChatPage";
 
 // ─── OAuth2 / PKCE Config ─────────────────────────────────────────────────────
 // Replace these values with your actual OAuth provider details
@@ -26,6 +33,55 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             {/* Add more routes here */}
+            <Route
+              path="/study-materials"
+              element={
+                <StudyMaterials />
+              }
+            />
+            {/* mentorship */}
+            <Route
+              path="/mentorship"
+              element={
+                <Mentorship />
+              }
+            />
+            {/* community */}
+            <Route
+              path="/community"
+              element={
+                <Community />
+              }
+            />
+            {/* create- profile */}
+            <Route
+              path="/create-profile"
+              element={
+                <CreateProfileForm />
+              }
+            />
+
+            {/* - view user */}
+            <Route
+              path="/view-user"
+              element={
+                <UserProfileRouter />
+              }
+            />
+
+            {/* - view user */}
+            <Route
+              path="/nearby"
+              element={
+                <NearestUsersPage />
+              }
+            />
+
+            {/* - view user */}
+            <Route
+              path="/chat/:userId"
+              element={<ChatPage />}
+            />
           </Routes>
         </Router>
       </AuthProvider>

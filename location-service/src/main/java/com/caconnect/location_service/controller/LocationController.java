@@ -21,15 +21,15 @@ public class LocationController {
 
     private final LocationService locationService;
 
-    @PostMapping("/")
+    @PostMapping()
     public Mono<ResponseEntity<Location>> saveLocationToDB(@RequestBody LocationRequest locationRequest) {
         return locationService.saveLocationToDB(locationRequest)
                 .map(ResponseEntity::ok);
     }
 
-    @GetMapping("/users/{userId}/location")
-    public Mono<ResponseEntity<Location>> getLocationByUserId(@PathVariable String userId) {
-        return locationService.getLocationByUserId(userId)
+    @GetMapping("/users/{keyCloakId}/location")
+    public Mono<ResponseEntity<Location>> getLocationByUserId(@PathVariable String keyCloakId) {
+        return locationService.getLocationByUserId(keyCloakId)
                 .map(ResponseEntity::ok);
     }
 

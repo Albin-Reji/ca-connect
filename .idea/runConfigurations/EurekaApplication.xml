@@ -7,7 +7,7 @@
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="com.nearca.eureka.*" />
-        <option name="ENABLED" value="true" />
+        <option name="ENABLED" value="false" />
       </pattern>
     </extension>
     <method v="2">

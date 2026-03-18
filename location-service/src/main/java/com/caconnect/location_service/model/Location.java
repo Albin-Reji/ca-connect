@@ -15,7 +15,7 @@ public class Location {
     private String locationId;
 
     @Column(unique = true, nullable = false)
-    private String userId;
+    private String keyCloakId;
 
     private Double latitude;
 

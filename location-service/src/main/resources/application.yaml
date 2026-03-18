@@ -4,9 +4,9 @@ spring:
 
 #  db connection
   datasource:
-    url: jdbc:postgresql://localhost:5432/ca_connect_db
+    url: ${SUPERBASE_DB_URL}
     username: postgres
-    password: ${DB_PASSWORD}
+    password: ${SUPERBASE_DB_PASSWORD}
     
   jpa:
     hibernate:
@@ -20,7 +20,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka:8761/eureka
 
 # port configuration
 server:

@@ -5,6 +5,7 @@ import com.caconnect.profile_service.dto.Location;
 import com.caconnect.profile_service.dto.LocationRequest;
 import com.caconnect.profile_service.dto.UserProfileRequest;
 import com.caconnect.profile_service.model.Address;
+import com.caconnect.profile_service.model.ExamStage;
 import com.caconnect.profile_service.model.UserProfile;
 import com.caconnect.profile_service.repository.UserProfileRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,10 +43,10 @@ public class UserProfileService {
 
     public Mono<UserProfile> saveUserProfile(UserProfileRequest request) {
         return getLatLong(request.getAddress())
-                .flatMap(latLng -> saveLocationToDB(latLng, request.getUserId()))
+                .flatMap(latLng -> saveLocationToDB(latLng, request.getKeyCloakId()))
                 .flatMap(locationResponse -> {
                     UserProfile userProfile = UserProfile.builder()
-                            .userId(request.getUserId())
+                            .keyCloakId(request.getKeyCloakId())
                             .fullName(request.getFullName())
                             .age(request.getAge())
                             .address(request.getAddress())
@@ -61,19 +62,20 @@ public class UserProfileService {
                 });
     }
 
-    public UserProfile getUserProfile(String userId) {
-        return userProfileRepository.findByUserId(userId);
+    public UserProfile getUserProfile(String keyCloakId) {
+        return userProfileRepository.findByKeyCloakId(keyCloakId);
     }
 
-    public Mono<Location> saveLocationToDB(LatitudeLongitude latitudeLongitude, String userId){
+    public Mono<Location> saveLocationToDB(LatitudeLongitude latitudeLongitude, String keyCloakId){
+        log.info("Save Location to DB: "+latitudeLongitude.toString()+ " keyCloakId "+keyCloakId);
         LocationRequest request=LocationRequest.builder()
-                .userId(userId)
+                .keyCloakId(keyCloakId)
                 .latitude(latitudeLongitude.getLat())
                 .longitude(latitudeLongitude.getLng())
                 .build();
 
         return locationWebClient.post()
-                .uri("/")
+                .uri("/api/locations")
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(Location.class);
@@ -97,7 +99,7 @@ public class UserProfileService {
                 .bodyToMono(JsonNode.class)
                 .map(json->{
                     JsonNode results = json.path("results");
-
+                    log.info("geometry Cordinates : "+results.toString());
                     JsonNode geometry = results.get(0).path("geometry");
 
                     double lat = geometry.path("lat").asDouble();
@@ -112,45 +114,72 @@ public class UserProfileService {
 
 
     public Mono<List<Location>> getNearestUsersOfSameExamStage(
-            String userId,
-            Integer limit
+            String keyCloakId,
+            Integer limit,
+            String examStageParam          // null/"MY_STAGE" → own stage, "ALL" → everyone
     ) {
-
-        return Mono.fromCallable(() ->
-                        userProfileRepository.findByUserId(userId)
-                )
+        return Mono.fromCallable(() -> userProfileRepository.findByKeyCloakId(keyCloakId))
                 .flatMap(currUserProfile ->
-
                         locationWebClient.get()
-                                .uri("/users/{userId}/location", userId)
+                                .uri("/api/locations/users/{keyCloakId}/location", keyCloakId)
                                 .retrieve()
                                 .bodyToMono(Location.class)
-
                                 .flatMap(currentUserLocation -> {
 
-                                    List<UserProfile> stageProfiles =
-                                            userProfileRepository.findAllByExamStage(
-                                                    currUserProfile.getExamStage()
-                                            );
-                                    log.info("STAGED USERPROFILE: {}",stageProfiles);
-                                    List<String> stageUserIds = stageProfiles.stream()
-                                            .map(UserProfile::getUserId)
-                                            .filter(id -> !id.equals(userId))
+                                    // ── ALL: no stage filter, use the simple nearest endpoint ──
+                                    if ("ALL".equalsIgnoreCase(examStageParam)) {
+                                        return locationWebClient.get()
+                                                .uri(uriBuilder -> uriBuilder
+                                                        .path("/api/locations/nearest")
+                                                        .queryParam("latitude",  currentUserLocation.getLatitude())
+                                                        .queryParam("longitude", currentUserLocation.getLongitude())
+                                                        .queryParam("limit", limit + 1) // +1 to account for self
+                                                        .build())
+                                                .retrieve()
+                                                .bodyToFlux(Location.class)
+                                                // exclude the requesting user from results
+                                                .filter(loc -> !loc.getKeyCloakId().equals(keyCloakId))
+                                                .take(limit)
+                                                .collectList();
+                                    }
+
+                                    // ── Specific stage or MY_STAGE ──
+                                    ExamStage targetStage;
+                                    if (examStageParam == null || "MY_STAGE".equalsIgnoreCase(examStageParam)) {
+                                        targetStage = currUserProfile.getExamStage();
+                                    } else {
+                                        targetStage = ExamStage.valueOf(examStageParam.toUpperCase());
+                                    }
+
+                                    List<String> stageKeyCloakIds = userProfileRepository
+                                            .findAllByExamStage(targetStage)
+                                            .stream()
+                                            .map(UserProfile::getKeyCloakId)
+                                            .filter(id -> !id.equals(keyCloakId))
                                             .toList();
-                                    log.info("USERIDS OF SAME EXAM STAGE: {}",stageUserIds);
+
+                                    log.info("Stage: {} | IDs: {}", targetStage, stageKeyCloakIds);
+
+                                    if (stageKeyCloakIds.isEmpty()) {
+                                        return Mono.just(List.of());
+                                    }
 
                                     return locationWebClient.get()
                                             .uri(uriBuilder -> uriBuilder
-                                                    .path("/nearestby/examstage")
-                                                    .queryParam("latitude", currentUserLocation.getLatitude())
-                                                    .queryParam("longitude", currentUserLocation.getLongitude())
-                                                    .queryParam("limit", limit)
-                                                    .queryParam("userIds", stageUserIds)
+                                                    .path("/api/locations/nearestby/examstage")
+                                                    .queryParam("latitude",    currentUserLocation.getLatitude())
+                                                    .queryParam("longitude",   currentUserLocation.getLongitude())
+                                                    .queryParam("limit",       limit)
+                                                    .queryParam("keyCloakIds", stageKeyCloakIds.toArray())
                                                     .build())
                                             .retrieve()
                                             .bodyToFlux(Location.class)
                                             .collectList();
                                 })
                 );
+    }
+
+    public Boolean isUserWithKeyCloakIdExist(String keyCloakId) {
+        return userProfileRepository.existsByKeyCloakId(keyCloakId);
     }
 }

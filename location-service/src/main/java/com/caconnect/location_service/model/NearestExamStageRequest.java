@@ -11,5 +11,5 @@ public class NearestExamStageRequest {
     private Double latitude;
     private Double longitude;
     private Integer limit;
-    private List<String> userIds;
+    private List<String> keyCloakIds;
 }
