@@ -70,3 +70,6 @@ To run this application locally, you need:
 
 ## 📜 License
 Currently unlicensed or explicitly intended for internal / educational use. (See `LICENSE` file if added).
+
+---
+**Albin Reji**
