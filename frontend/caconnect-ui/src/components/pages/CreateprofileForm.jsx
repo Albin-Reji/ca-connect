@@ -361,7 +361,8 @@ export default function CreateProfileForm() {
             console.log("Sending profile creation request:", requestBody);
             console.log("Auth token present:", !!token);
 
-            const res = await fetch("http://localhost:8080/api/profiles/", {
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            const res = await fetch(`${apiUrl}/profiles/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

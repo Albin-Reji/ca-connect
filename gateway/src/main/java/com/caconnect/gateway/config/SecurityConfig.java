@@ -22,7 +22,8 @@ public class SecurityConfig  {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange->exchange
-                        .pathMatchers("/actuator/*").permitAll()
+                        .pathMatchers("/actuator/*", "/ws/**").permitAll()
+// or restrict by a shared internal secret header instead
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2->oauth2.jwt(Customizer.withDefaults()))
@@ -37,6 +38,7 @@ public class SecurityConfig  {
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/ws/**", config);
         return  source;
     }
 }

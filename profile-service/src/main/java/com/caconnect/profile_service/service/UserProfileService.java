@@ -41,9 +41,9 @@ public class UserProfileService {
         this.userProfileRepository=userProfileRepository;
     }
 
-    public Mono<UserProfile> saveUserProfile(UserProfileRequest request) {
+    public Mono<UserProfile> saveUserProfile(UserProfileRequest request, String token) {
         return getLatLong(request.getAddress())
-                .flatMap(latLng -> saveLocationToDB(latLng, request.getKeyCloakId()))
+                .flatMap(latLng -> saveLocationToDB(latLng, request.getKeyCloakId(), token))
                 .flatMap(locationResponse -> {
                     UserProfile userProfile = UserProfile.builder()
                             .keyCloakId(request.getKeyCloakId())
@@ -66,7 +66,7 @@ public class UserProfileService {
         return userProfileRepository.findByKeyCloakId(keyCloakId);
     }
 
-    public Mono<Location> saveLocationToDB(LatitudeLongitude latitudeLongitude, String keyCloakId){
+    public Mono<Location> saveLocationToDB(LatitudeLongitude latitudeLongitude, String keyCloakId, String token){
         log.info("Save Location to DB: "+latitudeLongitude.toString()+ " keyCloakId "+keyCloakId);
         LocationRequest request=LocationRequest.builder()
                 .keyCloakId(keyCloakId)
@@ -76,6 +76,7 @@ public class UserProfileService {
 
         return locationWebClient.post()
                 .uri("/api/locations")
+                .header("Authorization", token)
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(Location.class);
@@ -116,12 +117,14 @@ public class UserProfileService {
     public Mono<List<Location>> getNearestUsersOfSameExamStage(
             String keyCloakId,
             Integer limit,
-            String examStageParam          // null/"MY_STAGE" → own stage, "ALL" → everyone
+            String examStageParam,
+            String token
     ) {
         return Mono.fromCallable(() -> userProfileRepository.findByKeyCloakId(keyCloakId))
                 .flatMap(currUserProfile ->
                         locationWebClient.get()
                                 .uri("/api/locations/users/{keyCloakId}/location", keyCloakId)
+                                .header("Authorization", token)
                                 .retrieve()
                                 .bodyToMono(Location.class)
                                 .flatMap(currentUserLocation -> {
@@ -135,6 +138,7 @@ public class UserProfileService {
                                                         .queryParam("longitude", currentUserLocation.getLongitude())
                                                         .queryParam("limit", limit + 1) // +1 to account for self
                                                         .build())
+                                                .header("Authorization", token)
                                                 .retrieve()
                                                 .bodyToFlux(Location.class)
                                                 // exclude the requesting user from results
@@ -172,6 +176,7 @@ public class UserProfileService {
                                                     .queryParam("limit",       limit)
                                                     .queryParam("keyCloakIds", stageKeyCloakIds.toArray())
                                                     .build())
+                                            .header("Authorization", token)
                                             .retrieve()
                                             .bodyToFlux(Location.class)
                                             .collectList();

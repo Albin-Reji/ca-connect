@@ -1,0 +1,168 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - caconnect-net
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.3
+    container_name: keycloak-auth
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8090
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+    command: start-dev
+    ports:
+      - "8090:8080"
+    depends_on:
+      - postgres
+    networks:
+      - caconnect-net
+
+  eureka:
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - caconnect-net
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      - eureka
+      - postgres
+      - keycloak
+    networks:
+      - caconnect-net
+
+  profile-service:
+    build:
+      context: ./profile-service
+      dockerfile: Dockerfile
+    container_name: profile-service
+    ports:
+      - "8083:8083"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - GEO_CAGE_API_KEY=${GEO_CAGE_API_KEY}
+    depends_on:
+      - eureka
+      - postgres
+      - keycloak
+    networks:
+      - caconnect-net
+
+  location-service:
+    build:
+      context: ./location-service
+      dockerfile: Dockerfile
+    container_name: location-service
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - GEO_CAGE_API_KEY=${GEO_CAGE_API_KEY}
+    depends_on:
+      - eureka
+      - postgres
+      - keycloak
+    networks:
+      - caconnect-net
+
+  messaging-service:
+    build:
+      context: ./messaging-service
+      dockerfile: Dockerfile
+    container_name: messaging-service
+    ports:
+      - "8084:8084"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - SUPERBASE_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SUPERBASE_DB_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - eureka
+      - postgres
+      - keycloak
+    networks:
+      - caconnect-net
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/ca-connect/protocol/openid-connect/certs
+    depends_on:
+      - eureka
+      - keycloak
+      - user-service
+      - profile-service
+      - location-service
+      - messaging-service
+    networks:
+      - caconnect-net
+
+  frontend:
+    build:
+      context: ./frontend/caconnect-ui
+      dockerfile: Dockerfile
+      args:
+        VITE_KEYCLOAK_URL: http://localhost:8090
+        VITE_API_BASE_URL: http://localhost:8080/api
+        VITE_WS_URL: http://localhost:8080/ws
+    container_name: frontend-ui
+    ports:
+      - "5173:80"
+    depends_on:
+      - gateway
+      - keycloak
+    networks:
+      - caconnect-net
+
+networks:
+  caconnect-net:
+    driver: bridge
+
+volumes:
+  postgres-data:

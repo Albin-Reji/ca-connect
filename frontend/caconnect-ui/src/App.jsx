@@ -15,12 +15,12 @@ import ChatPage from "./components/pages/ChatPage";
 // ─── OAuth2 / PKCE Config ─────────────────────────────────────────────────────
 // Replace these values with your actual OAuth provider details
 const authConfig = {
-  clientId: "ca-connect",              // e.g. "ca-connect-web"
+  clientId: "ca-connect",
   authorizationEndpoint: "http://localhost:8090/realms/ca-connect/protocol/openid-connect/auth",
   tokenEndpoint: "http://localhost:8090/realms/ca-connect/protocol/openid-connect/token",
-  redirectUri: window.location.origin,     // e.g. http://localhost:3000
+  redirectUri: "http://localhost:5173",
   scope: "openid profile email",
-  onRefreshTokenExpire: (event) => event.logIn(), // auto re-login on refresh expiry
+  onRefreshTokenExpire: (event) => event.logIn(),
 };
 
 function App() {

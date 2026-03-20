@@ -10,7 +10,7 @@ public class WebClientConfig {
     @Bean(name = "userServiceWebClient")
     public WebClient userServiceWebClient(){
         return WebClient.builder()
-                .baseUrl("http://localhost:8081")
+                .baseUrl("http://localhost:8080")
                 .build();
     }
 }

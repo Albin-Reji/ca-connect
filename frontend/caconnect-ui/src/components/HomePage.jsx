@@ -426,7 +426,8 @@ export default function HomePage() {
                     lastName: tokenData.family_name || "",
                 };
 
-                fetch("http://localhost:8080/api/users/sync", {
+                const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+                fetch(`${apiUrl}/users/sync`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -476,8 +477,9 @@ export default function HomePage() {
         //    We do NOT call logOut() from the library — that causes it to
         //    immediately re-initiate a new login flow after the redirect returns.
         if (idToken) {
+            const keycloakUrl = import.meta.env.VITE_KEYCLOAK_URL || "http://localhost:8090";
             const logoutUrl = new URL(
-                "http://localhost:8090/realms/ca-connect/protocol/openid-connect/logout"
+                `${keycloakUrl}/realms/ca-connect/protocol/openid-connect/logout`
             );
             logoutUrl.searchParams.set("client_id", "ca-connect");
             logoutUrl.searchParams.set("post_logout_redirect_uri", window.location.origin);
@@ -499,8 +501,9 @@ export default function HomePage() {
             scope: "openid profile email",
         });
 
+        const keycloakUrl = import.meta.env.VITE_KEYCLOAK_URL || "http://localhost:8090";
         const registerUrl =
-            `http://localhost:8090/realms/ca-connect/protocol/openid-connect/registrations?${params}`;
+            `${keycloakUrl}/realms/ca-connect/protocol/openid-connect/registrations?${params}`;
 
         window.location.href = registerUrl;
     };

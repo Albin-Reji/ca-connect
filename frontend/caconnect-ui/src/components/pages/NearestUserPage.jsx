@@ -323,7 +323,8 @@ export default function NearestUsersPage() {
 
     const fetchProfile = useCallback(async (id) => {
         try {
-            const res = await fetch(`http://localhost:8080/api/profiles/users/${id}`, {
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            const res = await fetch(`${apiUrl}/profiles/users/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (!res.ok) return null;
@@ -333,8 +334,9 @@ export default function NearestUsersPage() {
 
     const fetchMyLocation = useCallback(async () => {
         try {
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
             const res = await fetch(
-                `http://localhost:8080/api/locations/users/${keyCloakId}/location`,
+                `${apiUrl}/locations/users/${keyCloakId}/location`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             if (!res.ok) return null;
@@ -354,7 +356,8 @@ export default function NearestUsersPage() {
         setLoading(true); setError(null); setResults(null); setProfiles({});
 
         try {
-            let url = `http://localhost:8080/api/profiles/users/${keyCloakId}/nearest/${n}`;
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            let url = `${apiUrl}/profiles/users/${keyCloakId}/nearest/${n}`;
             if (examStage !== "MY_STAGE") {
                 url += `?examStage=${examStage}`;
             }
