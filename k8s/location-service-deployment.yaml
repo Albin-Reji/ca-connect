@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: location-service
+  labels:
+    app: location-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: location-service
+  template:
+    metadata:
+      labels:
+        app: location-service
+    spec:
+      containers:
+      - name: location-service
+        image: albinreji/caconnect-location-service
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8082
+        env:
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          value: "http://eureka-server:8761/eureka/"
+        - name: EUREKA_CLIENT_REGISTERWITHeureka
+          value: "false"
+        - name: EUREKA_CLIENT_FETCHREGISTRY
+          value: "false"
+        - name: SERVER_PORT
+          value: "8082"
+        - name: SUPERBASE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: SUPERBASE_DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_URL
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: location-service-service
+spec:
+  selector:
+    app: location-service
+  ports:
+  - port: 8082
+    targetPort: 8082

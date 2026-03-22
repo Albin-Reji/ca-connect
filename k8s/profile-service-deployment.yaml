@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profile-service
+  labels:
+    app: profile-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: profile-service
+  template:
+    metadata:
+      labels:
+        app: profile-service
+    spec:
+      containers:
+      - name: profile-service
+        image: albinreji/caconnect-profile-service
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8083
+        env:
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          value: "http://eureka-server:8761/eureka/"
+        - name: EUREKA_CLIENT_REGISTERWITHeureka
+          value: "false"
+        - name: EUREKA_CLIENT_FETCHREGISTRY
+          value: "false"
+        - name: SERVER_PORT
+          value: "8083"
+        - name: SUPERBASE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: SUPERBASE_DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_URL
+        - name: GEO_CAGE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: GEO_CAGE_API_KEY
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: profile-service-service
+spec:
+  selector:
+    app: profile-service
+  ports:
+  - port: 8083
+    targetPort: 8083
