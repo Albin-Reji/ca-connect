@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useNavigate } from "react-router-dom";
+import { config } from '../../config';
 
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
@@ -375,7 +376,7 @@ export default function ViewProfilePage() {
   useEffect(() => {
     if (!keyCloakId || !token) return;
     setLoading(true);
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    const apiUrl = config.API_BASE_URL;
     fetch(`${apiUrl}/profiles/users/${keyCloakId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })

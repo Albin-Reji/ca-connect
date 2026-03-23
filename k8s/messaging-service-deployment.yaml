@@ -17,16 +17,12 @@ spec:
       containers:
       - name: messaging-service
         image: albinreji/caconnect-messaging-service
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8084
         env:
         - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
           value: "http://eureka-server:8761/eureka/"
-        - name: EUREKA_CLIENT_REGISTERWITHeureka
-          value: "false"
-        - name: EUREKA_CLIENT_FETCHREGISTRY
-          value: "false"
         - name: SERVER_PORT
           value: "8084"
         - name: SUPERBASE_DB_PASSWORD
@@ -43,8 +39,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: messaging-service-service
+  name: messaging-service
 spec:
+  type: ClusterIP
   selector:
     app: messaging-service
   ports:

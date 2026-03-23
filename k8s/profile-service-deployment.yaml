@@ -17,16 +17,12 @@ spec:
       containers:
       - name: profile-service
         image: albinreji/caconnect-profile-service
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8083
         env:
         - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
           value: "http://eureka-server:8761/eureka/"
-        - name: EUREKA_CLIENT_REGISTERWITHeureka
-          value: "false"
-        - name: EUREKA_CLIENT_FETCHREGISTRY
-          value: "false"
         - name: SERVER_PORT
           value: "8083"
         - name: SUPERBASE_DB_PASSWORD
@@ -48,8 +44,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: profile-service-service
+  name: profile-service
 spec:
+  type: ClusterIP
   selector:
     app: profile-service
   ports:

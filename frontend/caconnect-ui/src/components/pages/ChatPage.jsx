@@ -18,6 +18,7 @@ import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWebSocket } from "./useWebSocket";
+import { config } from '../../config';
 
 // ── Google Fonts (injected once) ────────────────────────────────────────────
 const fontLink = document.createElement("link");
@@ -370,7 +371,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (!otherUserId || !token) return;
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    const apiUrl = config.API_BASE_URL;
     fetch(`${apiUrl}/profiles/users/${otherUserId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -395,7 +396,7 @@ export default function ChatPage() {
       else setLoadingOlder(true);
 
       try {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+        const apiUrl = config.API_BASE_URL;
         const res = await fetch(
           `${apiUrl}/messages/conversation/${otherUserId}?page=${page}&size=${PAGE_SIZE}`,
           {

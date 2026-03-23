@@ -3,6 +3,7 @@ import { AuthContext } from "react-oauth2-code-pkce";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredential, logout } from "./../store/authSlice";
 import { Link } from "react-router-dom";
+import { config } from '../config';
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
 fontLink.rel = "stylesheet";
@@ -426,7 +427,7 @@ export default function HomePage() {
                     lastName: tokenData.family_name || "",
                 };
 
-                const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+                const apiUrl = config.API_BASE_URL;
                 fetch(`${apiUrl}/users/sync`, {
                     method: "POST",
                     headers: {
@@ -477,7 +478,7 @@ export default function HomePage() {
         //    We do NOT call logOut() from the library — that causes it to
         //    immediately re-initiate a new login flow after the redirect returns.
         if (idToken) {
-            const keycloakUrl = import.meta.env.VITE_KEYCLOAK_URL || "http://localhost:8090";
+            const keycloakUrl = config.KEYCLOAK_URL;
             const logoutUrl = new URL(
                 `${keycloakUrl}/realms/ca-connect/protocol/openid-connect/logout`
             );
@@ -501,7 +502,7 @@ export default function HomePage() {
             scope: "openid profile email",
         });
 
-        const keycloakUrl = import.meta.env.VITE_KEYCLOAK_URL || "http://localhost:8090";
+        const keycloakUrl = config.KEYCLOAK_URL;
         const registerUrl =
             `${keycloakUrl}/realms/ca-connect/protocol/openid-connect/registrations?${params}`;
 

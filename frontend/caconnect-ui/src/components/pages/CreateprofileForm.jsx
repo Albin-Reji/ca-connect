@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useNavigate } from "react-router-dom";
+import { config } from '../../config';
 
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
@@ -361,7 +362,7 @@ export default function CreateProfileForm() {
             console.log("Sending profile creation request:", requestBody);
             console.log("Auth token present:", !!token);
 
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            const apiUrl = config.API_BASE_URL;
             const res = await fetch(`${apiUrl}/profiles/`, {
                 method: "POST",
                 headers: {

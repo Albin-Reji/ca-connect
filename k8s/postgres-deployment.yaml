@@ -40,16 +40,22 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data      # ← mount the parent directory
+        - name: init-db
+          mountPath: /docker-entrypoint-initdb.d
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
           claimName: postgres-pvc
+      - name: init-db
+        configMap:
+          name: init-db-configmap
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
 spec:
+  type: ClusterIP
   selector:
     app: postgres
   ports:

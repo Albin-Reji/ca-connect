@@ -14,27 +14,27 @@ spring:
             - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
           routes:
             - id: user-service
-              uri: lb://USER-SERVICE
+              uri: http://user-service:8081
               predicates:
                 - Path=/api/users/**
 
             - id: profile-service
-              uri: lb://PROFILE-SERVICE
+              uri: http://profile-service:8083
               predicates:
                 - Path=/api/profiles/**
 
             - id: location-service
-              uri: lb://LOCATION-SERVICE
+              uri: http://location-service:8082
               predicates:
                 - Path=/api/locations/**
 
             - id: messaging-service
-              uri: lb://MESSAGING-SERVICE
+              uri: http://messaging-service:8084
               predicates:
                 - Path=/api/messages/**
 
             - id: messaging-service-ws
-              uri: lb://MESSAGING-SERVICE
+              uri: http://messaging-service:8084
               predicates:
                 - Path=/ws/**
 

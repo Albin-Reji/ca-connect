@@ -46,14 +46,18 @@ spec:
           value: admin
         - name: KEYCLOAK_ADMIN_PASSWORD
           value: admin
-        - name: KC_HOSTNAME
-          value: "localhost"
-        - name: KC_HOSTNAME_PORT
-          value: "8090"
+        - name: KC_HOSTNAME_STRICT
+          value: "false"
         - name: KC_HOSTNAME_STRICT_HTTPS
           value: "false"
         - name: KC_HTTP_ENABLED
           value: "true"
+        - name: KC_PROXY_HEADERS
+          value: "xforwarded"
+        - name: KC_HOSTNAME
+          value: "localhost"          # ← add this
+        - name: KC_HTTP_PORT
+          value: "8080"  
         resources:
           requests:
             memory: "512Mi"
@@ -67,6 +71,7 @@ kind: Service
 metadata:
   name: keycloak-service
 spec:
+  type: LoadBalancer
   selector:
     app: keycloak
   ports:

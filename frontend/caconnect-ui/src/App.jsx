@@ -11,14 +11,14 @@ import CreateProfileForm from "./components/pages/CreateprofileForm";
 import UserProfileRouter from "./components/pages/UserProfileRouter";
 import NearestUsersPage from "./components/pages/NearestUserPage";
 import ChatPage from "./components/pages/ChatPage";
+import { config } from "./config";
 
 // ─── OAuth2 / PKCE Config ─────────────────────────────────────────────────────
-// Replace these values with your actual OAuth provider details
 const authConfig = {
-  clientId: "ca-connect",
-  authorizationEndpoint: "http://localhost:8090/realms/ca-connect/protocol/openid-connect/auth",
-  tokenEndpoint: "http://localhost:8090/realms/ca-connect/protocol/openid-connect/token",
-  redirectUri: "http://localhost:5173",
+  clientId: config.KEYCLOAK_CLIENT_ID,
+  authorizationEndpoint: `${config.KEYCLOAK_URL}/realms/ca-connect/protocol/openid-connect/auth`,
+  tokenEndpoint: `${config.KEYCLOAK_URL}/realms/ca-connect/protocol/openid-connect/token`,
+  redirectUri: config.FRONTEND_URL,
   scope: "openid profile email",
   onRefreshTokenExpire: (event) => event.logIn(),
 };

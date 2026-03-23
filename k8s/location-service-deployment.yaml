@@ -23,10 +23,6 @@ spec:
         env:
         - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
           value: "http://eureka-server:8761/eureka/"
-        - name: EUREKA_CLIENT_REGISTERWITHeureka
-          value: "false"
-        - name: EUREKA_CLIENT_FETCHREGISTRY
-          value: "false"
         - name: SERVER_PORT
           value: "8082"
         - name: SUPERBASE_DB_PASSWORD
@@ -43,8 +39,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: location-service-service
+  name: location-service
 spec:
+  type: ClusterIP
   selector:
     app: location-service
   ports:
