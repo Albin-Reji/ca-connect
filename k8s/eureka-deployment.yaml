@@ -17,7 +17,7 @@ spec:
       containers:
       - name: eureka-server
         image: albinreji/caconnect-eureka
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8761
         env:

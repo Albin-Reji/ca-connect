@@ -5,7 +5,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${KEYCLOAK_JWK_URI:http://keycloak:8090/realms/ca-connect/protocol/openid-connect/certs}
+          jwk-set-uri: ${KEYCLOAK_JWK_URI:http://keycloak-service:8090/realms/ca-connect/protocol/openid-connect/certs}
   cloud:
     gateway:
       server:

@@ -28,16 +28,6 @@ spec:
           value: "keycloak-service:8090"
         - name: NGINX_ENVSUBST_FILTER
           value: "GATEWAY_HOST|KEYCLOAK_HOST"
-        - name: VITE_API_BASE_URL
-          value: "http://gateway-service:8080/api"
-        - name: VITE_KEYCLOAK_URL
-          value: "http://keycloak-service:8090"
-        - name: VITE_WS_URL
-          value: "http://gateway-service:8080/ws"
-        - name: VITE_KEYCLOAK_CLIENT_ID
-          value: "ca-connect"
-        - name: VITE_FRONTEND_URL
-          value: "http://frontend-service:5173"
 --- 
 apiVersion: v1
 kind: Service

@@ -17,7 +17,7 @@ spec:
       containers:
       - name: location-service
         image: albinreji/caconnect-location-service
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8082
         env:
@@ -35,6 +35,11 @@ spec:
             secretKeyRef:
               name: postgres-secret
               key: POSTGRES_URL
+        - name: GEO_CAGE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: GEO_CAGE_API_KEY
 --- 
 apiVersion: v1
 kind: Service
