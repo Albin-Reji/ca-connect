@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: albinreji/caconnect-frontend
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        # Nginx proxy targets — K8s service names
+        - name: GATEWAY_HOST
+          value: "gateway-service:8080"
+        - name: KEYCLOAK_HOST
+          value: "keycloak-service:8090"
+        - name: NGINX_ENVSUBST_FILTER
+          value: "GATEWAY_HOST|KEYCLOAK_HOST"
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+  ports:
+  - port: 5173
+    targetPort: 80

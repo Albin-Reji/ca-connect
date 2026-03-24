@@ -16,6 +16,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { config } from '../../config';
 
 export function useWebSocket(token, userId, onMessageReceived) {
     const [connected, setConnected] = useState(false);
@@ -39,7 +40,7 @@ export function useWebSocket(token, userId, onMessageReceived) {
         if (!token || !userId) return;
 
         const client = new Client({
-            webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_URL || 'http://localhost:8080/ws'),
+            webSocketFactory: () => new SockJS(config.WS_URL),
             connectHeaders: {
                 Authorization: `Bearer ${token}`,
             },

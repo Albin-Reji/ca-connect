@@ -5,43 +5,47 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8090/realms/ca-connect/protocol/openid-connect/certs
+          jwk-set-uri: ${KEYCLOAK_JWK_URI:http://keycloak-service:8090/realms/ca-connect/protocol/openid-connect/certs}
   cloud:
     gateway:
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-      routes:
-        - id: user-service
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/api/users/**
+      server:
+        webflux:
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+          routes:
+            - id: user-service
+              uri: http://user-service:8081
+              predicates:
+                - Path=/api/users/**
 
-        - id: profile-service
-          uri: lb://PROFILE-SERVICE
-          predicates:
-            - Path=/api/profiles/**
+            - id: profile-service
+              uri: http://profile-service:8083
+              predicates:
+                - Path=/api/profiles/**
 
-        - id: location-service
-          uri: lb://LOCATION-SERVICE
-          predicates:
-            - Path=/api/locations/**
+            - id: location-service
+              uri: http://location-service:8082
+              predicates:
+                - Path=/api/locations/**
 
-        - id: messaging-service
-          uri: lb://MESSAGING-SERVICE
-          predicates:
-            - Path=/api/messages/**
+            - id: messaging-service
+              uri: http://messaging-service:8084
+              predicates:
+                - Path=/api/messages/**
 
-        - id: messaging-service-ws
-          uri: lb://MESSAGING-SERVICE
-          predicates:
-            - Path=/ws/**
-#eureka configuration
+            - id: messaging-service-ws
+              uri: http://messaging-service:8084
+              predicates:
+                - Path=/ws/**
+
+# eureka configuration
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
-#server port
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}
+    fetch-registry: ${EUREKA_CLIENT_FETCHREGISTRY:true}
+    register-with-eureka: ${EUREKA_CLIENT_REGISTERWITHEUREKA:true}
+
+# server port
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}

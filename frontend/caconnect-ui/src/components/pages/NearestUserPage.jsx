@@ -1,6 +1,7 @@
 import { useState, useCallback, useContext, useEffect } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useNavigate } from "react-router-dom";
+import { config } from '../../config';
 
 const fontLink = document.createElement("link");
 fontLink.rel = "stylesheet";
@@ -323,7 +324,7 @@ export default function NearestUsersPage() {
 
     const fetchProfile = useCallback(async (id) => {
         try {
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            const apiUrl = config.API_BASE_URL;
             const res = await fetch(`${apiUrl}/profiles/users/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -334,7 +335,7 @@ export default function NearestUsersPage() {
 
     const fetchMyLocation = useCallback(async () => {
         try {
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            const apiUrl = config.API_BASE_URL;
             const res = await fetch(
                 `${apiUrl}/locations/users/${keyCloakId}/location`,
                 { headers: { Authorization: `Bearer ${token}` } }
@@ -356,7 +357,7 @@ export default function NearestUsersPage() {
         setLoading(true); setError(null); setResults(null); setProfiles({});
 
         try {
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            const apiUrl = config.API_BASE_URL;
             let url = `${apiUrl}/profiles/users/${keyCloakId}/nearest/${n}`;
             if (examStage !== "MY_STAGE") {
                 url += `?examStage=${examStage}`;

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
@@ -151,9 +149,14 @@ services:
         VITE_KEYCLOAK_URL: http://localhost:8090
         VITE_API_BASE_URL: http://localhost:8080/api
         VITE_WS_URL: http://localhost:8080/ws
+        VITE_KEYCLOAK_CLIENT_ID: ca-connect
+        VITE_FRONTEND_URL: http://localhost:5173
     container_name: frontend-ui
     ports:
       - "5173:80"
+    environment:
+      - GATEWAY_HOST=gateway:8080
+      - KEYCLOAK_HOST=keycloak:8080
     depends_on:
       - gateway
       - keycloak

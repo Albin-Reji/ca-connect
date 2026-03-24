@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
+import { config } from '../../config';
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
@@ -267,7 +268,7 @@ export default function MessageTest() {
         setData(null);
         setIsError(false);
         try {
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+            const apiUrl = config.API_BASE_URL;
             const res = await fetch(`${apiUrl}/messages/`, {
                 method: "GET",
                 headers: {
@@ -321,7 +322,7 @@ export default function MessageTest() {
                             {/* ── Endpoint ── */}
                             <div className="mt-endpoint">
                                 <span className="mt-method">GET</span>
-                                <span className="mt-url">{import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/messages/</span>
+                                <span className="mt-url">{config.API_BASE_URL}/messages/</span>
                             </div>
 
                             {/* ── User ID ── */}

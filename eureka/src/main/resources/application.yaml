@@ -5,6 +5,7 @@ spring:
 #eureka server config
 eureka:
   client:
+    enabled: false
     fetch-registry: false
     register-with-eureka: false
 

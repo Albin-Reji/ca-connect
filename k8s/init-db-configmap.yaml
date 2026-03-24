@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-db-configmap
+data:
+  init-db.sql: |
+    CREATE DATABASE keycloak;
+    -- Enable required extensions for geo-distance queries
+    CREATE EXTENSION IF NOT EXISTS cube;
+    CREATE EXTENSION IF NOT EXISTS earthdistance;

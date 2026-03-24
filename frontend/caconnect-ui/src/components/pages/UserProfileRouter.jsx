@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import ViewProfilePage from "./ViewProfilePage";
 import CreateProfileForm from "./CreateprofileForm";
+import { config } from '../../config';
 
 // ─── Shared CSS vars (spinner only — pages bring their own full CSS) ──────────
 const css = `
@@ -40,7 +41,7 @@ export default function UserProfileRouter() {
   useEffect(() => {
     if (!keyCloakId || !token) return;
 
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+    const apiUrl = config.API_BASE_URL;
     fetch(`${apiUrl}/profiles/users/${keyCloakId}/exist`, {
       headers: { Authorization: `Bearer ${token}` },
     })
